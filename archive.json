@@ -1,0 +1,1653 @@
+{
+  "magic": "E!vIA5L86J2I",
+  "timestamp": "2022-05-08T00:27:16.546188+00:00",
+  "repo": "GrumpyOldTroll/draft-jholland-quic-multicast",
+  "labels": [
+    {
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    },
+    {
+      "name": "documentation",
+      "description": "Improvements or additions to documentation",
+      "color": "0075ca"
+    },
+    {
+      "name": "duplicate",
+      "description": "This issue or pull request already exists",
+      "color": "cfd3d7"
+    },
+    {
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
+    },
+    {
+      "name": "good first issue",
+      "description": "Good for newcomers",
+      "color": "7057ff"
+    },
+    {
+      "name": "invalid",
+      "description": "This doesn't seem right",
+      "color": "e4e669"
+    },
+    {
+      "name": "question",
+      "description": "Further information is requested",
+      "color": "d876e3"
+    },
+    {
+      "name": "wontfix",
+      "description": "This will not be worked on",
+      "color": "ffffff"
+    }
+  ],
+  "issues": [
+    {
+      "number": 1,
+      "id": "I_kwDOG6NyZs5H-mEc",
+      "title": "Clients should be able to tell if data came from multicast or unicast",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/1",
+      "state": "CLOSED",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Last sentence of section 2 reads: \r\n\r\n`An application using a multicast-capable QUIC implementation that receives a datagram or stream data has no knowledge at the application layer whether multicast was used or not used for that data, it will only know it has received unidirectional server-to-client application data.`\r\n\r\nAs the security and privacy guarantees for data that has been delivered over multicast are (inherently) lower than over unicast, I feel like this could cause serious issues for applications. I think that any implementation that supports multicast delivery has to at least make it clear to the application that the data has been delivered over multicast, or even better yet only allow multicast delivery if the application opted in for it. ",
+      "createdAt": "2022-04-19T00:48:52Z",
+      "updatedAt": "2022-04-21T05:57:00Z",
+      "closedAt": "2022-04-21T05:57:00Z",
+      "comments": [
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "+1, yes thanks and good point.  I should probably add \"if the receiver has opted into receiving multicast\".",
+          "createdAt": "2022-04-19T05:39:42Z",
+          "updatedAt": "2022-04-19T05:39:42Z"
+        },
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "Closed with https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/6",
+          "createdAt": "2022-04-21T05:57:00Z",
+          "updatedAt": "2022-04-21T05:57:00Z"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "id": "I_kwDOG6NyZs5H-mh6",
+      "title": "Delivery of MC_SESSION_PROPERTIES over multicast",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/2",
+      "state": "CLOSED",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Section 9.1: \r\n\r\n`An MC_SESSION_PROPERTIES frame (type=TBD-01) is sent from server to client, either with the unicast connection or in an existing joined multicast session.`\r\n\r\nIs there any reason that this couldn't always be delivered just over the unicast stream? As the AEAD key and algorithm are mutable, I think this might expose an unnecessary attack vector. By only having it on the unicast stream its safer for both the server (as it knows all recipients that will get it) as well as the client (as it knows it comes from the legitimate source). ",
+      "createdAt": "2022-04-19T00:52:57Z",
+      "updatedAt": "2022-05-02T18:08:11Z",
+      "closedAt": "2022-05-02T18:08:11Z",
+      "comments": [
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "I don't think it costs much to send this always over unicast, but I'm also not sure it buys you anything on security.  My thought here was that you've exposed updates only to those who already had access to the stream.\r\n\r\nI guess in the forward secrecy case if the shared key was leaked from a confederate, they'd have to maintain a unicast listener to get the next update.  So maybe it's worth a little bit on security.  It's a fair point I guess.  I'm a little 'meh', the tradeoff seems relatively minor in both directions.  My plan was to leave it up to the server, but I'm fine with forbidding it also I guess.",
+          "createdAt": "2022-04-19T05:47:35Z",
+          "updatedAt": "2022-04-19T05:47:35Z"
+        },
+        {
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I guess to me it's also about separation of concerns where the multicast session is just data and all the control data goes over the unicast connection. Though I guess due to PATH_CHALLENGE frames that won't be entirely possible either way so I agree with your \"meh\", I guess in the end it won't matter. ",
+          "createdAt": "2022-04-19T14:26:43Z",
+          "updatedAt": "2022-04-19T14:26:43Z"
+        },
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "Ah, I see.  I was thinking more like \"data is data\", and data that's the same for a whole bunch of clients is useful to send over multicast whether it's control or application data.  I was basically aiming to disallow only those frames that don't make sense because of the \"unidirectional alternate path\" part.\r\n\r\nSimilar to PATH_CHALLENGE, I think things like PING and PADDING might be needed just for practical purposes, and the INTEGRITY frames are I think pretty useful to permit over other multicast sessions, since they otherwise make a new unicast scaling limit.  (I guess that shouldn't really matter if you're scaled appropriately to have a graceful full-unicast fallback the way you should be, but it seems like even 3% of the unicast baseline can get to be a lot so it's potentially worth offloading...). The other frames are maybe less important, but I didn't see a reason to exclude them.\r\n\r\nImproving security would be a good reason though.  But even there, if there's a threat model from a pervasive monitoring attacker getting a key leaked from some unicast context and then losing that access but staying joined to follow all the key updates (whereas he'd otherwise have to keep access to a unicast endpoint), then it seems to me the right answer might be to put the key updates on the unicast channel, but other changes to mutable properties on the multicast channel still could be usefully sent over the session, since they're the same for everyone.  (The changes for the keys and for the other things could just be sent in separate MC_SESSION_PROPERTIES frames.).\r\n\r\nAnyway, I guess I'm thinking to close this for now if we're both 'meh', and either reopen or make a new issue if we later find a reason it makes a difference.",
+          "createdAt": "2022-04-21T07:01:17Z",
+          "updatedAt": "2022-04-21T07:01:17Z"
+        },
+        {
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Actually, I had another idea: if the only issue is forward secrecy, what if a recommendation is added that every nth MC_SESSION_PROPERTIES should be delivered over unicast to break the chain of endless forward secrecy violations? ",
+          "createdAt": "2022-04-21T07:42:18Z",
+          "updatedAt": "2022-04-21T07:42:18Z"
+        },
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "That seems reasonable.\r\n\r\nBut this is more like every N key rotations, and only has to count updates containing a new key, updates to other properties probably shouldn't be counted.",
+          "createdAt": "2022-04-25T06:57:48Z",
+          "updatedAt": "2022-04-25T06:57:48Z"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "id": "I_kwDOG6NyZs5H-m_g",
+      "title": "ack-eliciting packets",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/3",
+      "state": "CLOSED",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Should there be an inclusion that packets including any of the Frames sent over the multicast stream are not ack-eliciting? I assume the intention is to not send ACK frames on the multicast streams but rather use MC_SESSION_ACK. Should there then also be a not ack-eliciting MC_DATA frame that carries the multicast data? Otherwise if STREAM frames are used they would also be ACK eliciting. ",
+      "createdAt": "2022-04-19T00:57:43Z",
+      "updatedAt": "2022-04-21T15:23:25Z",
+      "closedAt": "2022-04-21T15:23:25Z",
+      "comments": [
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "What I was thinking is that ack-eliciting frames will elicit an MC_SESSION_ACK on the unicast channel instead of a normal ACK, since there is no reverse path for packets sent over multicast.  Good catch, this should be explicitly spelled out.  Same for MC_PATH_RESPONSE when a PATH_CHALLENGE is received.",
+          "createdAt": "2022-04-19T05:50:54Z",
+          "updatedAt": "2022-04-19T05:50:54Z"
+        },
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "Closed via https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/8",
+          "createdAt": "2022-04-21T15:23:24Z",
+          "updatedAt": "2022-04-21T15:23:24Z"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "id": "I_kwDOG6NyZs5H-qYO",
+      "title": "What *is* a multicast session?",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/4",
+      "state": "CLOSED",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "I am confused about what a multicast session actually is. Section 2:\r\n\r\n`A multicast session (or just session) is a one-way communication stream`\r\n\r\nSo is it just a (special) QUIC stream? If so, does Session ID in 9.2 just mean stream ID? \r\n\r\nBut if it is just a stream, what is the point of the Max Streams field in MC_SESSION_PROPERTIES (and why is it mutable)?",
+      "createdAt": "2022-04-19T01:27:35Z",
+      "updatedAt": "2022-04-21T15:23:48Z",
+      "closedAt": "2022-04-21T15:23:47Z",
+      "comments": [
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "It's a one-way analog of a connection, the session id replaces the connection id in the 1-rtt packets.  The intent is that streams and datagrams can be carried within a packet for a multicast session, just as they can be carried in a connection.\r\n\r\nI see now that you've quoted it that \"one-way communication stream\" is a bad phrasing since it collides with \"stream\".  Maybe \"one-way analog of a QUIC connection\" would be a better phrasing?",
+          "createdAt": "2022-04-19T05:54:40Z",
+          "updatedAt": "2022-04-19T05:54:40Z"
+        },
+        {
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Ok, if it is the analog of a connection I am quite confused about how the interaction between the two (or more) will actually look like. Who creates the session, the unicast connection? If its a connection analog wouldn't it have to go through a handshake? Wouldn't this also require a pretty significant API between the connection and the session? \r\n\r\nIn my mind I always imagined everything living in the same connection and the multicast data would just be on a one directional stream. The server would initiate the stream(s) after learning from the client what its limits are. It would then send a frame (e.g. MC_SESSION_PROPERTIES) over that stream using unicast. That frame would then trigger the client to issue an IGMP/MLD join. From there on the data received via multicast would be pipelined into the stream, processed(decrypted, integrity checked) and then delivered to the application. Though I am sure there are good reasons I have missed that would prevent it being done this way. ",
+          "createdAt": "2022-04-19T14:38:01Z",
+          "updatedAt": "2022-04-19T14:38:01Z"
+        },
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "I was thinking about this a bit more.  \"Analog to a connection\" is wrong, you're correct.  I'll try again:\r\n\r\nI think maybe it's a unidirectional network path that can be shared by multiple connections.\r\n\r\nThe session id uses the same slot in a packet as a connection id does, and it's used in a similar way as a connection id is used, to link packets received to a connection.\r\n\r\nI don't think it's a one-directional stream (in the [quic usage](https://www.rfc-editor.org/rfc/rfc9000.html#name-streams) of the term \"stream\") because many one-directional streams can exist on the same network path.  (For instance, it's fairly common when using quic to send one object per stream.)\r\n\r\nBut everything else you described I think matches my intent (except I separated the JOIN from the PROPERTIES as separate frames):\r\nFrom the receiver's point of view, all the data received from the session is part of the single same connection with the server.  When a packet is received it's decrypted and integrity checked, then the frames in the packet are processed as any other frames in the connection--any STREAM frame received will get data passed to the application immediately if it's in-order for the stream (otherwise if there are gaps that stream will have to wait for retransmit, though other streams can progress).  Any DATAGRAM frame causes immediate delivery of application data.  Other kinds of (permitted) frames influence the connection as appropriate (e.g. PATH_CHALLENGE causes a MC_PATH_RESPONSE, PING will cause an MP_SESSION_ACK over unicast even if there wasn't application data, etc.)\r\n\r\nDoes that help any?  It's probably important to get this point clear, thanks for digging on it.",
+          "createdAt": "2022-04-19T17:20:17Z",
+          "updatedAt": "2022-04-19T17:20:17Z"
+        },
+        {
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "body": "That does clear things up, thanks. The part I am still not sure about is why there is a need for the multicast session abstraction? Maybe stream is the wrong abstraction as well, maybe it is just another path as described in multipath-quic? I guess I am still missing something somewhere...",
+          "createdAt": "2022-04-20T23:31:57Z",
+          "updatedAt": "2022-04-20T23:31:57Z"
+        },
+        {
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Nvm, I just read your PR and it looks like we agree that it is another path",
+          "createdAt": "2022-04-20T23:33:41Z",
+          "updatedAt": "2022-04-20T23:33:41Z"
+        },
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "Closed via https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/8",
+          "createdAt": "2022-04-21T15:23:47Z",
+          "updatedAt": "2022-04-21T15:23:47Z"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "id": "I_kwDOG6NyZs5H-rLe",
+      "title": "MC_SESSION_INTEGRITY",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/5",
+      "state": "CLOSED",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "`For type TBD-05, Length is present and is a count of packet hashes. For TBD-04, Length is not present and the packet hashes extend to the end of the packet.`\r\n\r\nShould this read \"[...] extend to the end of the session.\"?",
+      "createdAt": "2022-04-19T01:33:58Z",
+      "updatedAt": "2022-04-21T06:10:54Z",
+      "closedAt": "2022-04-21T06:10:53Z",
+      "comments": [
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "No, this should be \"to the end of the QUIC packet\".  Compare to the phrasing and the type selection for the datagram length field: https://www.rfc-editor.org/rfc/rfc9221.html#section-4-5.2.1\r\n\r\nA MC_SESSION_INTEGRITY frame either needs a length (when followed by another frame) or it doesn't (when it extends to the end of the packet), and can maybe fit one extra hash.",
+          "createdAt": "2022-04-19T05:58:37Z",
+          "updatedAt": "2022-04-19T05:58:37Z"
+        },
+        {
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Oh right, got it thanks. \r\n\r\nAlso, I guess it isn't in yet but shouldn't each hash now be able to be assigned to a specific packet number? If so, maybe this frame should also include a list of packet numbers. ",
+          "createdAt": "2022-04-19T14:48:58Z",
+          "updatedAt": "2022-04-19T14:48:58Z"
+        },
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "Yes, my intent was that a MC_SESSION_INTEGRITY frame contains in-order packets and uses the \"packet number start\" field as the packet number of the first hash in the frame:\r\nhttps://grumpyoldtroll.github.io/draft-jholland-quic-multicast/draft-jholland-quic-multicast.html#name-mc_session_integrity\r\n\r\nI should clean that explanation up for sure, yes.",
+          "createdAt": "2022-04-19T17:55:37Z",
+          "updatedAt": "2022-04-19T17:55:37Z"
+        },
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "Closed via https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/7",
+          "createdAt": "2022-04-21T06:10:53Z",
+          "updatedAt": "2022-04-21T06:10:53Z"
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "id": "I_kwDOG6NyZs5IJvdE",
+      "title": "Add something like a MC_RESERVE_SESSIONIDS frame.",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/9",
+      "state": "OPEN",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "MaxF12"
+      ],
+      "labels": [],
+      "body": "From Max in issue #4 comment:\r\nhttps://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/8#discussion_r854656985\r\n\r\nThere should probably be a mechanic to force clients to not use some connection IDs for unicast connections. I think only doing it in the MC_SESSION_PROPERTIES frame is too late, it should probably be done immediately after the handshake of the unicast connection. Its basically a frame telling the client \"Do not use any of these connection IDs for your unicast streams as we might have a multicast session that uses this ID. If you (by sheer bad luck) already use one of them for a unicast connection (i.e. the initially created one), issue a new connection ID and retire the old one immediately.\"",
+      "createdAt": "2022-04-21T05:26:02Z",
+      "updatedAt": "2022-05-04T17:42:12Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "Capturing the other notes from the thread:\r\nI guess session properties should implicitly reserve the session id, but also a MC_RESERVE_SESSIONIDS frame to reserve a list of IDs without sending their properties.\r\n\r\nI think if there is a collision it doesn't matter until the server issues a JOIN, but if the client has not yet migrated connection ID it can refuse the join with an \"ID Collision\" reason and we don't really need other signaling about it I think? Actually it occurs to me the server should already know if the connection ID is in use, and can determine when it has closed to retry the join?",
+          "createdAt": "2022-04-21T15:21:45Z",
+          "updatedAt": "2022-04-21T15:21:45Z"
+        },
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "Another option here is just an empty MC_CHANNEL_PROPERTIES, if there's space constraints and to NOT add this frame.  I think if you use a 0 content field and a 0 from packet number it's only 2 bytes of overhead.  We can make a note that server can do this to reserve channel id space even before a channel is active, and that clients SHOULD migrate away from colliding connection IDs and avoid creating colliding connection ids whenever they see a MC_CHANNEL_PROPERTIES, and then we don't need a new frame.",
+          "createdAt": "2022-05-04T17:41:37Z",
+          "updatedAt": "2022-05-04T17:42:12Z"
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "id": "I_kwDOG6NyZs5INviv",
+      "title": "Session already has a meaning in QUIC",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/10",
+      "state": "CLOSED",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "\"Session\" already has a meaning in QUIC.  It appears to be implicitly imported via TLS, c.f.:\r\n - https://www.rfc-editor.org/rfc/rfc9000#section-14.2.1-4\r\n - https://www.rfc-editor.org/rfc/rfc9001.html#name-session-resumption\r\n - https://www.rfc-editor.org/rfc/rfc8446.html#section-2.2\r\n\r\nI'm thinking maybe we can search & replace \"session\" with \"channel\"?\r\n\r\n\"Channel\" also has a meaning in SSM (c.f. https://www.rfc-editor.org/rfc/rfc4607.html#page-4), but using it here would be complementary instead of divergent.  (\"Channel\" in SSM refers to a network path, and likewise if we used it instead of \"Session\" in the QUIC extensions it would refer to a network path and associated objects...)",
+      "createdAt": "2022-04-21T21:17:37Z",
+      "updatedAt": "2022-04-29T00:14:53Z",
+      "closedAt": "2022-04-29T00:14:53Z",
+      "comments": [
+        {
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I agree that channel would fit well with its meaning in SSM, only thing to keep in mind is that QUIC specifies a stream as `A unidirectional or bidirectional channel of ordered bytes within a QUIC connection.`\r\n\r\nI think there should be no confusion there though. ",
+          "createdAt": "2022-04-22T00:12:26Z",
+          "updatedAt": "2022-04-22T00:12:26Z"
+        },
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "Yes, I don't think that will cause nearly as much confusion as \"session\".\r\n\r\nA grep for \"channel\" in google's quiche suggests that it once had a meaning back when the project was spdy and there are some remnants still in the code, but these also have a much smaller footprint than \"session\", and I think are only in obsolete parts, c.f.:\r\n\r\n~~~\r\nnet/third_party/quiche/src/quic/core/tls_server_handshaker.cc:  // Channel ID is not supported when TLS is used in QUIC.\r\n~~~",
+          "createdAt": "2022-04-25T07:05:46Z",
+          "updatedAt": "2022-04-25T07:05:46Z"
+        },
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "Sessions have been renamed to channels.",
+          "createdAt": "2022-04-29T00:14:53Z",
+          "updatedAt": "2022-04-29T00:14:53Z"
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "id": "I_kwDOG6NyZs5IOIyE",
+      "title": "Is it always necessary to acknowledge all STREAM frames?",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/11",
+      "state": "CLOSED",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Following QUIC mechanics, every single STREAM frame has to be acknowledged. This is done so that missing frames can be retransmitted. However, in Multicast there are several use cases where a retransmission of missing frames might not be desired (such as live video streaming) and having to acknowledge every packet creates unnecessary overhead (which at Multicast scales could add up to be quite significant). I think it might be useful to have a mechanic that replaced the acknowledgement of every frame immediately with either a bundled acknowledgment of several frames that only occurs (relatively) rarely or even just an acknowledgment that (any) data is still being received over the Multicast Channel. I guess a high max_ack_delay could be used to bundle acknowledgments, but that is set by the client. There is also not (yet) the inclusion of a mechanic that would allow for different transport properties between the unicast connection and the Multicast channels, so you would be stuck with a high max_ack_delay for unicast frames as well. ",
+      "createdAt": "2022-04-22T00:06:39Z",
+      "updatedAt": "2022-04-28T23:19:53Z",
+      "closedAt": "2022-04-28T23:19:53Z",
+      "comments": [
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "Yes, some kind of mechanism like this seems like a good idea.  I was originally thinking bundling could cover it, but I think you're right that it shouldn't be so tightly coupled to max_ack_delay that you have to pick between impacting your unicast recovery and requiring too many acks for multicast data, and that as it stands there's not a way to treat them separately.\r\n\r\nAs a brainstorming proposal:\r\nwhat about maybe a \"recommended ack bundle size\" as another session property that advises a client on a bundle size specific to the session to use as a target for a bundled acknowledgement count, and maybe this would override max_ack_delay for sessions below the recommended bundle size unless there is a gap in the packet sequence numbers that lasted longer than max_ack_delay or max_idle_time was exceeded (or maybe also if a ping or path challenge was received).  I think this would help with ack overhead (at least for the typical case?) without impacting unicast recovery.\r\n\r\nTo the other point you mentioned:  I think there are already mechanisms that can avoid the need for retransmits, such as RESET_STREAM and DATAGRAM, and I don't think I know any use cases that need another way? (draft-lcurley-warp for instance will use a stream per object and a reset stream if there was loss that's late enough they'd rather abandon it, I think))",
+          "createdAt": "2022-04-27T01:12:46Z",
+          "updatedAt": "2022-04-27T01:12:46Z"
+        },
+        {
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Sorry, should have phrased it better, let me retry: I think the server does not always even need to know which specific packets are getting acknowledged (in cases when there is no intention to retransmit missing packets), so it might be sufficient to just send a frame saying \"Out of the last x packets I received y\" so the server can still know if/ how many dropped packets there are. I wonder if the handshake should also somehow negotiate if the server and client want reliable transmission or not. \r\n\r\nI like the idea about having a bundle size, maybe it would also be sufficient to say clients SHOULD try to fill the PMTU as good as possible? ",
+          "createdAt": "2022-04-27T14:42:12Z",
+          "updatedAt": "2022-04-27T14:42:12Z"
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "id": "I_kwDOG6NyZs5ISGVP",
+      "title": "Client behavior when unicast connection is disrupted",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/12",
+      "state": "OPEN",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "How would a client behave if the unicast connection is interrupted but the Multicast channels still receive data? It wouldn\u2019t be able to check the integrity of any packets, but it isn\u2019t exactly idling either so the idle connection timeout would not trigger I guess? Should this be clarified so that all multicast session are left and the entire connection is shutdown if there is no message over the unicast connection for longer than the idle timeout? ",
+      "createdAt": "2022-04-22T19:30:18Z",
+      "updatedAt": "2022-04-25T06:54:36Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "Yeah, good question.  I guess maybe the client should actively ensure it still has unicast connectivity and leave sessions if it can't prove it does, on a timescale similar to max idle (or maybe another value?).\r\n\r\nI guess if client gets no packets for some time on unicast, it should probably send a ping, and if it still has no ack after some time it should leave its sessions with a reason like \"failed unicast\".  But yes, there should certainly be a section detailing the behavior, good point.",
+          "createdAt": "2022-04-25T06:54:13Z",
+          "updatedAt": "2022-04-25T06:54:36Z"
+        }
+      ]
+    },
+    {
+      "number": 13,
+      "id": "I_kwDOG6NyZs5ISIBO",
+      "title": "Path migration ",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/13",
+      "state": "OPEN",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "What happens if the unikalster path is being migrated due to a change in NAT/ mobility? It would probably mean that all sessions should issue new IGMP/MLD reports since it\u2019s quite possible that the device is connected to a new router does not yet have forwarding state and waiting for a query might cause unnecessary delays.\r\n\r\nIt might also mean that the idle timeout for the session is (falsely) triggered as it could take some time for the join to propagate far enough upstream to receive Multicast packets once again. ",
+      "createdAt": "2022-04-22T19:38:25Z",
+      "updatedAt": "2022-04-25T06:50:16Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "Yes, if the client switches to a new network path it'll need to attempt rejoining its joined sessions on the new path.\r\n\r\nThat's a good point about a false idle time issue, but that's also applicable to the initial join--there maybe should be a different initial join max idle vs. the max idle after the first data is received.  If we had that, on a connection change maybe client could use the initial join max idle.  (And also maybe server should assume that unicast data is required until there start being MP_SESSION_ACKs, and this should also start immediately upon a unicast connection id change?)\r\n\r\nIt is also possible the client limits change in this scenario, such as the \"permit IPv4\" or the \"permit IPv6\" flags or the max rate.  These might require server to change the sessions the client joins.\r\n\r\nAnyway, +1, there should be a discussion of the issues that can happen on a client network change, and perhaps some guidance on how to handle it.  That's probably a whole section, with perhaps several subsections.",
+          "createdAt": "2022-04-25T06:50:16Z",
+          "updatedAt": "2022-04-25T06:50:16Z"
+        }
+      ]
+    },
+    {
+      "number": 14,
+      "id": "I_kwDOG6NyZs5ISJR6",
+      "title": "Max streams ",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/14",
+      "state": "OPEN",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "RFC 9000, section 4.6: `Only streams with a stream ID less than \"(max_streams * 4\r\n   + first_stream_id_of_type)\" can be opened`\r\n   \r\nSince each session has its own stream ID space a different restriction might need to be specified to make sure the combination of all streams across all sessions does not exceed the limit set by max_streams.",
+      "createdAt": "2022-04-22T19:45:53Z",
+      "updatedAt": "2022-05-04T17:32:29Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "I don't think each session has its own stream ID space necessarily.  In particular, I think missing data from a stream can be retransmitted by the unicast connection by using the same stream ID that was used in the , so I think the space is shared across the connection.\r\n\r\nBut it does probably have to say something to clarify the point, and the server has to do something to ensure the stream IDs don't collide if there's any unidirectional streams used for unicast.  I think what that is can be left up to the server.  (It could for instance use only IDs with ID % 8 == 7, leaving those for ID % 8 == 3 for unidirectional, for instance, or it could use the same internal signaling channels on the server side that ensure the servers all have access to all the session data.)",
+          "createdAt": "2022-04-25T06:26:50Z",
+          "updatedAt": "2022-04-25T06:26:50Z"
+        },
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "There's some text relevant to this already in section 4.4:\r\n\r\n\"However, since clients can join later than a channel began, clients supporting the multicast extensions to QUIC should be prepared to handle stream IDs that do not begin at early values, since by the time a client joins a channel in progress the stream id count might have been increasing for a long time. Clients should therefore begin with a high initial_max_streams_uni or send an early MAX_STREAMS type 0x13 value (see Section 19.11 of [[RFC9000](https://grumpyoldtroll.github.io/draft-jholland-quic-multicast/draft-jholland-quic-multicast.html#RFC9000)]) with a high limit.\r\n\r\nMC_CHANNEL_PROPERTIES can provide a recommended value for max_streams_uni to allow for uninterrupted transport using the multicast channel.\"\r\n\r\nI think in general we still need to abide by the max_streams limits, but there's a few more tweaks and guidance we should have, including:\r\n- If a channel will exceed the max_streams of a client, the server MUST send a MC_CHANNEL_LEAVE asking for a leave at or before the packet number that will exceed it\r\n- A server MUST NOT tell a client to join a channel that will imminently exceed the MAX_STREAMS of the client.  A server MAY (or SHOULD?) send a STREAMS_BLOCKED if it is prevented from asking a client to join a channel by this constraint.\r\n- Add some flexibility on the error response from section 4.6 of RFC 9000--if a client sees a stream id exceeding its max streams that was delivered on a channel, it SHOULD (or MAY?) drop the packet and leave the channel (with a new reason?) instead of closing the connection. (This can happen with a correct server if the LEAVE the server sent was lost and so the client didn't receive it in time.)\r\n\r\nThere might be a few others, but I think at least these?",
+          "createdAt": "2022-05-04T17:30:49Z",
+          "updatedAt": "2022-05-04T17:32:29Z"
+        }
+      ]
+    },
+    {
+      "number": 15,
+      "id": "I_kwDOG6NyZs5Ik_fz",
+      "title": "How is a Stateless Reset handled?",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/15",
+      "state": "CLOSED",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "https://www.rfc-editor.org/rfc/rfc9000#section-10.3",
+      "createdAt": "2022-04-27T17:15:09Z",
+      "updatedAt": "2022-05-02T18:06:34Z",
+      "closedAt": "2022-05-02T18:06:34Z",
+      "comments": []
+    },
+    {
+      "number": 16,
+      "id": "I_kwDOG6NyZs5IlAIN",
+      "title": "Define the server's responsibility for buffering old data",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/16",
+      "state": "OPEN",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Session data needs reliability on streams, but also servers need to not be required to buffer unbounded amounts of data.  Define what the failure modes look like.",
+      "createdAt": "2022-04-27T17:16:40Z",
+      "updatedAt": "2022-04-27T17:16:40Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 21,
+      "id": "I_kwDOG6NyZs5IsBmD",
+      "title": "Channel IDs should be carried in frames like Connection IDs",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/21",
+      "state": "CLOSED",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Connection ID with a required length, e.g. https://www.rfc-editor.org/rfc/rfc9000#name-new_connection_id-frames:\r\n\r\n~~~\r\nNEW_CONNECTION_ID Frame {\r\n...\r\n  Connection ID (8..160),\r\n...\r\n}\r\n~~~\r\n\r\nInstead of (i):\r\n\r\n~~~\r\nMC_CHANNEL_INTEGRITY Frame {\r\n...\r\n  Channel ID (i),\r\n...\r\n}\r\n\r\n~~~\r\n",
+      "createdAt": "2022-04-29T00:32:41Z",
+      "updatedAt": "2022-05-02T11:19:23Z",
+      "closedAt": "2022-05-02T11:19:23Z",
+      "comments": []
+    },
+    {
+      "number": 23,
+      "id": "I_kwDOG6NyZs5IyuYe",
+      "title": "There are references to (S,G)s even though IP layer is allowed to be ASM",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/23",
+      "state": "CLOSED",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Max pointed out that there's some places talking about (S,G)s when talking about the IP layer multicast Group or Channel, rather than \"(*,G)s or (S,G)s\" or something, but the quic channels are not restricted to only SSM (they can include ASM).  Some possible solutions:\r\n- restrict to SSM\r\n- generalize the references\r\n  - possibly by adding a term to capture \"(*,G) or (S,G)\" more succinctly",
+      "createdAt": "2022-04-29T16:54:37Z",
+      "updatedAt": "2022-05-05T04:12:22Z",
+      "closedAt": "2022-05-05T04:12:22Z",
+      "comments": []
+    },
+    {
+      "number": 24,
+      "id": "I_kwDOG6NyZs5I1HaV",
+      "title": "Clarify that joins are optional in the Channel Management section",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/24",
+      "state": "OPEN",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "From Sam Hurst:\r\nBe more explicit in the \"Channel Management\" section that the client is not obligated to join the multicast channel once it receives an MC_SESSION_JOIN frame. If it chooses not to, it has the option to send an MC_SESSION_STATE_CHANGE frame with the \"declined join\" reason, but that isn't actually mentioned in the session management section.",
+      "createdAt": "2022-04-30T17:42:22Z",
+      "updatedAt": "2022-04-30T17:42:22Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 26,
+      "id": "I_kwDOG6NyZs5I53sh",
+      "title": "Add a section on recovery",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/26",
+      "state": "OPEN",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "In general, retransmits for the frames with reliability in dropped packets on the multicast channels can happen on any channel that reaches the client, either over the unicast connection or the same or a different multicast channel.  Server has responsibility to give the client all the frames with reliability (any of the control frames, as well as STREAM frames).\r\n\r\nAlso possible to do a STREAM_RESET if a server gives up on some block of data.  When this happens, it's possible for the client to pick the stream up again later after a STREAM_BOUNDARY.\r\n\r\nA section covering this will probably also need to cover https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/16 (about how to handle limits on how much data server will buffer before abandoning a client that's not keeping up), so maybe these issues should be merged, or have different subsections.  But something reasonably complete is going to be needed on this topic.",
+      "createdAt": "2022-05-02T17:14:11Z",
+      "updatedAt": "2022-05-02T17:14:11Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 27,
+      "id": "I_kwDOG6NyZs5I6HBM",
+      "title": "Frame spec cleanup",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/27",
+      "state": "CLOSED",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "GrumpyOldTroll"
+      ],
+      "labels": [],
+      "body": "There's a number of problems with the frames:\r\n\r\n1. Channel IDs need a length preceding the 8..160.\r\n2. Some missing reasons in CLIENT_CHANNEL_STATE\r\n3. Better extensibility if we make the bit fields into varints and define their selector bits, I think.  Is this useful?\r\n\r\n(Note: working thru these in the course of frame implementation (https://github.com/GrumpyOldTroll/quiche/issues/5), proposal forthcoming...)\r\n\r\nFor point 3 I'm tentatively thinking something like this:\r\n\r\n~~~\r\n---\r\nMC_CLIENT_LIMITS Frame {\r\n  Type (i) = TBD-09 (experiments use 0xff3e809),\r\n  Client Limits Sequence Number (i),\r\n  Capabilities Flags(i),\r\n  Max Aggregate Rate (i),\r\n  Max Channel IDs (i),\r\n  Max Joined Count (i),\r\n}\r\n---\r\n{: #fig-mc-client-limits-format title=\"MC_CLIENT_LIMITS Frame Format\"}\r\n\r\nThe sequence number is implicitly 0 before the first MC_CLIENT_LIMITS frame from the client, and increases by 1 each new frame that's sent.\r\nNewer frames override older ones.\r\n\r\nLimit Support Flags is a bit field computed as follows:\r\n\r\n - 0x1 is set if IPv4 channels are permitted\r\n - 0x2 is set if IPv6 channels are permitted\r\n - 0x4 is set if SSM channels are permitted\r\n - 0x8 is set if ASM channels are permitted\r\n~~~\r\n\r\nPlus something similar in CHANNEL_PROPERTIES.  Nice part is this doesn't change encoding if we add flags that go beyond the reserved space, it just ends up taking more varint space when they're set.",
+      "createdAt": "2022-05-02T18:17:27Z",
+      "updatedAt": "2022-05-04T19:19:15Z",
+      "closedAt": "2022-05-04T19:19:15Z",
+      "comments": [
+        {
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I guess the same would also make sense in the transport property then. I am not sure what the trade-off between better extensibility and less available space is, a 1 byte sized var int only has 6 usable bits for example. I guess at the moment we still have 6 unused bits anyway so maybe there isn't much need for extensibility anyway?  \r\n\r\nIt would come down to 4 if you include the SSM/ASM selector though I still can't think of any cases where you would rather have ASM than SSM (this goes into #23). The server needs to know of all the senders anyway since it has to send the integrity frames for all streams, so it could just use multiple SSM joins for all the senders. Allowing ASM just seems like an enormous hassle and security vulnerability. I guess the use case would be somewhere within a domain where data might come from any number of senders, but again this wouldn't work as everything has to go through the server for the integrity frames. ",
+          "createdAt": "2022-05-02T22:02:54Z",
+          "updatedAt": "2022-05-02T22:05:29Z"
+        },
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "Yeah, I'm not sure what the trade-off is either.  I found the WriteBytes function, so I guess I didn't really need to do this change, but now that it's done locally I'm not sure it's worth changing back, I think it's the same either way.\r\n\r\nRegarding ASM: The only interesting use case I know of is to allow P2P recovery between local neighbors.  As long as packets are unmodified by peers, they could still match a server's value for the integrity checks.  But you'd still need some kind of coordination.  NORM did this, and you could imagine something similar based on clients probing for others nearby, and sending each other NACKs when they think they missed data, but that would be another new thing beyond scope of the first version, and probably not worthwhile.\r\n\r\nSo yes, I think you're right it's probably more trouble than it's worth and we should probably just strip out ASM support as the best answer for #23.  I guess it leaves a couple extra unused bits for growth in a few spots, but mostly it prevents anyone from trying to use it, so we don't have to analyze how it could be used on purpose.  (However, some networks convert SSM membership reports to ASM on the network, so we still might need to talk about what kinds of problems are possible to see in the client, but I think this just falls under handling for spurious traffic--ignore if it's light and leave if it's heavy I think is the advice we probably want in the end.)",
+          "createdAt": "2022-05-03T03:31:50Z",
+          "updatedAt": "2022-05-03T03:31:50Z"
+        }
+      ]
+    },
+    {
+      "number": 28,
+      "id": "I_kwDOG6NyZs5I6Luz",
+      "title": "Add an explanation for STREAM_BOUNDARY",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/28",
+      "state": "OPEN",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "GrumpyOldTroll"
+      ],
+      "labels": [],
+      "body": "Good question on what this is and how it's meant to be used from Sam.  Rough answer I sent:\r\n\r\nIt's there because we have shared channels and they might carry streams, and it\u2019s useful to allow the streams to be long-lived.  It\u2019s possible (and I think useful) for a client to start processing an in-progress stream starting at the boundary of an HTTP push for instance, or at a message boundary for another higher-layer protocol, but without this stream boundary the client doesn\u2019t know at what byte offset inside the stream it\u2019s safe to start processing data (if a client started trying to parse the stream in the middle of the HTTP push, it wouldn\u2019t know how to interpret it).\r\n\r\nIn addition to h3 server push (and maybe webtransport?), I think this is useful for the latest moq-related proposals like RUSH (https://datatracker.ietf.org/doc/draft-kpugin-rush/) and WARP (https://datatracker.ietf.org/doc/draft-lcurley-warp/).\r\n",
+      "createdAt": "2022-05-02T18:35:39Z",
+      "updatedAt": "2022-05-02T18:35:39Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 29,
+      "id": "I_kwDOG6NyZs5I69zO",
+      "title": "Can the same stream ID be used in multiple channels?",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/29",
+      "state": "OPEN",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Since the stream ID space is shared between all channels and the connection, would it be possible for two channels to send data on the same stream? \r\n\r\n4.4 says:\r\n`a server can always avoid stream ID collisions with the stream IDs carried in sessions`\r\nDoes this mean it MUST avoid collisions? \r\n\r\nI guess it depends on where the stream data is processed, if there is a sub process for each channel it might be ok, but if they all end up in the same place you would presumably see different packets with the same ACK number (since each channel uses its own ACK number space, so they have to overlap), which would probably lead to issues.\r\n\r\nIn either case I think it is something that should be clarified. \r\n\r\n",
+      "createdAt": "2022-05-02T22:15:35Z",
+      "updatedAt": "2022-05-03T03:11:35Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "Yes, probably something should be clarified.\r\n\r\nA rough answer to your questions:\r\nStream frames for the same stream can appear on different channels, yes.\r\n\r\nHowever, all stream frames for the same stream still have to represent data from a single continuous stream of bytes, such that data at the same offset is identical regardless of what path a stream frame arrived on.  So for example, as explained in [2.2 of 9000](https://www.rfc-editor.org/rfc/rfc9000#section-2.2), \"The data at a given offset MUST NOT change if it is sent multiple times; an endpoint MAY treat receipt of different data at the same offset within a stream as a connection error of type PROTOCOL_VIOLATION\".\r\n\r\nYou could send a frame with bytes 0-15 for stream 3 on channel 1, and then send a frame with bytes 16-30 for stream 3 on channel 2, then send a frame with bytes 10-25 over unicast.  While probably inefficient, this would all be correct behavior that can be properly interpreted by the client as long as the byte at each offset of that stream is the same no matter where it came from.\r\n\r\nThe more likely real scenario is recovery.  You send a packet 14 on channel 1 and it contains bytes 50-100 of stream 3, but the MP_CHANNEL_ACKS the server sees suggest the packet has probably been lost.  Server then sends packet 70 on its unicast channel, and it contains a copy of the frame that was lost in packet 14 of channel 1, thus filling in the missing data.  If packet 70 is lost as well, maybe later it'll send packet 80 with another copy of the same frame (or maybe it'll break up the frame into smaller pieces, which is fine as long as each byte at each offet is still the same.)\r\n\r\nIt doesn't matter for the stream that there's different packet number spaces.  The server is responsible for knowing what stream frames the receiver has received on each path according to the acks (and what the contents of those frames were, so it can retransmit).  As an optimization, the collection of servers using the same channel might also notice that many receivers on the same channel lost the same packet, and you might send a new packet on that channel containing the frames that need retransmitting, rather than using unicast for the recovery.",
+          "createdAt": "2022-05-03T02:49:16Z",
+          "updatedAt": "2022-05-03T02:49:16Z"
+        },
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "The comment about stream ID collisions is maybe a mistake.  It's ok to coordinate sending of stream data on different channels, provided it's the same stream data.  What's not ok is if the different channels each think they're independently in charge of the data that goes out in a particular stream id, and therefore produce different data for the stream at any of the same offsets.  \"Collision\" is probably too ambiguous a term there, sorry for the confusion.",
+          "createdAt": "2022-05-03T02:51:24Z",
+          "updatedAt": "2022-05-03T02:51:24Z"
+        },
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "As a matter of operational practice, the way I imagine actually running is that there's one thing generating the stream, and the stream data might be mirrored on a few channels (for instance, an ipv4 and an ipv6 channel, or maybe channels with different encryption algorithms, in order to support different sets of receivers with different capabilities).  The IPv4 channel will probably break the stream up into frames at different offsets from the IPv6 channel, because they'll have different packet payload sizes.  This is ok, provided that they carry the same sequence of data.\r\n\r\nA receiver might leave one network and join another network, and as a result might switch (at server's direction, after passing new client limits derived from its network change) from the ip4 channel to the ip6 channel.  Maybe it misses a few packets, which the server notices via the mp_channel_acks, so server fills in the missing stream data with unicast-transmitted data of the same stream (this might or might not have offset boundaries for the frames that get generated that are different from the channels' frame boundaries).  Although each of these paths has a different packet number space, since they're all using the same stream id and the data at each offset in the stream id is the same no matter where it came from, they can always avoid confusion.\r\n\r\nThis kind of stream handling is all the same as in multipath and connection migration, I believe.  It doesn't matter what packet number space stream data arrived on for the client, just the stream id and the offset.\r\n\r\nThe packet number space is what gets acked, so the server has to keep track of which frames were in which packets so it can retransmit frames with the stream data that the client is still missing.  (It doesn't have to be the same frames, it just has to carry the same data.  2 frames from 50-100 and 101-150 is the same as 1 frame from 50-150, is the same as 3 frames from 50-75, 76-125, and 126-150, as long as they're the same stream id and the byte at every offset is the same.)",
+          "createdAt": "2022-05-03T03:11:35Z",
+          "updatedAt": "2022-05-03T03:11:35Z"
+        }
+      ]
+    },
+    {
+      "number": 32,
+      "id": "I_kwDOG6NyZs5JA_gF",
+      "title": "MC_CHANNEL_LEAVE text incomplete",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/32",
+      "state": "OPEN",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Write something more coherent for the MC_CHANNEL_LEAVE text.",
+      "createdAt": "2022-05-04T07:08:10Z",
+      "updatedAt": "2022-05-04T07:08:10Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 33,
+      "id": "I_kwDOG6NyZs5JCOgU",
+      "title": "Initial timeout",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/33",
+      "state": "OPEN",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The initial time to join a channel can be significantly longer than the value in max idle time (as that is intended as the time to detect a disruption of an already established channel) as the join has to be propagated and the multicast tree constructed. \r\n\r\nThere could probably be an additional field in MC_CHANNEL_PROPERTIES (something like max establishment time) or just general guidance and a recommendation on the time it might take. ",
+      "createdAt": "2022-05-04T12:45:17Z",
+      "updatedAt": "2022-05-04T16:12:56Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "Yes, I wasn't sure whether this belongs in MC_CHANNEL_PROPERTIES or whether it should just be documented as a client-side configuration parameter that doesn't appear on the wire.  We certainly need to say something about it, but I'm not sure server-driven properties is the right place to put it because it's more dependent on what typically works for the receive network than on a common characteristic of the server.\r\nThe way I think of it, there's some kind of \"expected join time\" in the client network (which might be unknown and needs a reasonable default), and this should be added to the max_idle_time before sending a leave due to lack of traffic.\r\n\r\nMaybe another reason for the leave would be good to add as well to indicate \"never got any data\" that's different from \"Max Idle Time Exceeded\".",
+          "createdAt": "2022-05-04T16:12:56Z",
+          "updatedAt": "2022-05-04T16:12:56Z"
+        }
+      ]
+    },
+    {
+      "number": 34,
+      "id": "I_kwDOG6NyZs5JCQ-c",
+      "title": "AMT",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/34",
+      "state": "CLOSED",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [
+        "enhancement"
+      ],
+      "body": "This might be too much for the initial document and could be an expansion, but it might be useful to add a frame that contains information about available AMT relays for the channel in question. That way you could still distribute load better in cases where e2e native multicast isn't supported by utilizing as much multicast as possible (up until the relays) and reduce the load on the server by having many unicast connections. \r\n\r\nI guess this idea similar to having a fan out, but it might be an interesting alternative. You might even be able to do something clever by determining which relay is best suited by the clients IP or something along those lines and then just including that. \r\n\r\nI guess in theory this could be done by simply adding an AMT relay field to the MC_CHANNEL_PROPERTIES.",
+      "createdAt": "2022-05-04T12:54:37Z",
+      "updatedAt": "2022-05-04T18:50:06Z",
+      "closedAt": "2022-05-04T17:31:25Z",
+      "comments": [
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "I think this is just worse for network offload than sending the data on the unicast channel?\r\n\r\n(It adds a bit of AMT overhead, but since the gateway is embedded in the client and talking to a server-chosen relay it definitely didn't use any network replication except in the server-controlled part of the network.)",
+          "createdAt": "2022-05-04T16:19:24Z",
+          "updatedAt": "2022-05-04T16:19:24Z"
+        },
+        {
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Right, I was thinking that you might at some point get ISP/ operator provided relays close to the edge like Lenny (I think?)  suggests. I guess there is a bit missing that would allow these relays to announce themselves to the server. In either case, it should not be part of the base spec so I am gonna move this issue to my fork just so its written down somewhere. ",
+          "createdAt": "2022-05-04T17:30:19Z",
+          "updatedAt": "2022-05-04T17:30:19Z"
+        },
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "ISP/operator-run relays wouldn't be something the server could transmit in its channel properties.  That *could* happen, yes, and it *could* usefully be integrated with receive libraries, but it would be an integration with how to do local discovery of relays, not a server advertisement feature.\r\n\r\nI think this is plausible for instance with DNS-SD using a local search domain, which is why I put that discovery path in RFC 8777 at higher priority than the actual driad extension, but for the same reason it's not under the source ip's reverse ip dns space, it also can't be in the server-sent channel properties.  It would have to be a separate thing in the browser that's about local service discovery, so I think it's a separate thing from this spec.",
+          "createdAt": "2022-05-04T18:50:06Z",
+          "updatedAt": "2022-05-04T18:50:06Z"
+        }
+      ]
+    },
+    {
+      "number": 35,
+      "id": "I_kwDOG6NyZs5JETx2",
+      "title": "Loss of a MC_CHANNEL_PROPERTIES frame (and potentially MC_CHANNEL_LEAVE)",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/35",
+      "state": "OPEN",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "If sent over multicast, a MC_CHANNEL_PROPERTIES frame might get lost. Add text that states that servers MUST retransmit frames lost this way over unicast.\r\n\r\nIf the split into multiple frames happens, this would probably be only a MUST for the key update frames. ",
+      "createdAt": "2022-05-04T20:03:08Z",
+      "updatedAt": "2022-05-05T16:20:15Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "Why?  I think it's just up the server like anything else it wants to send on how's the best way?\r\n\r\nBoth unicast and multicast have cases where the client doesn't get the update before the Until Packet Number runs out, but then the client just leaves until further notice from the server, I think.  Is there some reason that's not a good enough fallback for this case?",
+          "createdAt": "2022-05-05T04:05:43Z",
+          "updatedAt": "2022-05-05T04:05:43Z"
+        },
+        {
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Well I was thinking more along the lines that the client misses a key change (that may or may not occur before the previously stated until_packet) and then suddenly can no longer verify the integrity of the multicasted frames.\r\n\r\nBut you\u2019re right, MUST is too strong here. I just thought it would be good to make it clear that this is something that might happen and will in most cases probably not be what the server intents. So maybe a SHOULD? ",
+          "createdAt": "2022-05-05T15:55:48Z",
+          "updatedAt": "2022-05-05T15:55:48Z"
+        },
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "Key change means they can no longer decrypt, but yes, same if they miss a hash algorithm change.\r\n\r\nI agree server has to cause a retransmit that client can receive and interpret in a reasonable amount of time, but I think it could for instance be sent on a different multicast channel rather than the unicast channel (and any channel that's broken or left by a client won't work, including the channel that just got updated and client missed it) but I'm not seeing how there's inherently a unicast-specific requirement as opposed to any path that's still working even if the frame in question got lost.\r\n\r\nMaybe it could be right to have a paragraph pointing out that when some updates are missed it makes the channel broken, so server shouldn't use it for retransmitting.",
+          "createdAt": "2022-05-05T16:20:15Z",
+          "updatedAt": "2022-05-05T16:20:15Z"
+        }
+      ]
+    },
+    {
+      "number": 36,
+      "id": "I_kwDOG6NyZs5JEVYp",
+      "title": "Be consistent about saying if frames are sent on channels or connections",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/36",
+      "state": "OPEN",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Most frames just state that they are sent \"From server to client\" while e.g. MC_SESSION_LEAVE says \"from server to client\r\nin either the unicast connection or a channel\"\r\n\r\nEither remove the specifier from everywhere or, and probably better, add it to everywhere. ",
+      "createdAt": "2022-05-04T20:06:22Z",
+      "updatedAt": "2022-05-05T04:06:53Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "I think removing it here and just using the list at the bottom as the only normative reference for what frames can be sent over which transmit options will make it easier to keep straight.",
+          "createdAt": "2022-05-05T04:06:53Z",
+          "updatedAt": "2022-05-05T04:06:53Z"
+        }
+      ]
+    }
+  ],
+  "pulls": [
+    {
+      "number": 6,
+      "id": "PR_kwDOG6NyZs42gLSI",
+      "title": "Attempt at addressing #1 ('no knowledge' on client data)",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/6",
+      "state": "MERGED",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2022-04-20T16:09:48Z",
+      "updatedAt": "2022-04-21T15:19:58Z",
+      "baseRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "baseRefName": "main",
+      "baseRefOid": "d249bc0faa2309e91d63530012096dd3e0bf9c1a",
+      "headRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "headRefName": "issue-1",
+      "headRefOid": "69d9fb95fc1c49c5e458c786ff4147e4c5277e2c",
+      "closedAt": "2022-04-21T15:19:31Z",
+      "mergedAt": "2022-04-21T15:19:31Z",
+      "mergedBy": "GrumpyOldTroll",
+      "mergeCommit": {
+        "oid": "25235e6c1050245e0e21dbb826425a6dfab5776a"
+      },
+      "comments": [
+        {
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Did you mean to merge instead of close it?",
+          "createdAt": "2022-04-21T08:28:03Z",
+          "updatedAt": "2022-04-21T08:28:03Z"
+        },
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "Yes, thanks.",
+          "createdAt": "2022-04-21T15:19:58Z",
+          "updatedAt": "2022-04-21T15:19:58Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOG6NyZs44f8Zk",
+          "commit": {
+            "abbreviatedOid": "69d9fb9"
+          },
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "LGTM",
+          "createdAt": "2022-04-20T23:54:42Z",
+          "updatedAt": "2022-04-20T23:54:42Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "id": "PR_kwDOG6NyZs42hLut",
+      "title": "issue #5: be clearer about packet numbers in INTEGRITY",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/7",
+      "state": "MERGED",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2022-04-20T21:17:00Z",
+      "updatedAt": "2022-04-21T06:10:08Z",
+      "baseRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "baseRefName": "main",
+      "baseRefOid": "d249bc0faa2309e91d63530012096dd3e0bf9c1a",
+      "headRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "headRefName": "issue-5",
+      "headRefOid": "612aa7b1a93b9f5aeae6bdd323e57b32a97c09b8",
+      "closedAt": "2022-04-21T06:09:58Z",
+      "mergedAt": "2022-04-21T06:09:58Z",
+      "mergedBy": "GrumpyOldTroll",
+      "mergeCommit": {
+        "oid": "8dc3669b3354172bcb984d0f9b426b2454a755e7"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOG6NyZs44f9bo",
+          "commit": {
+            "abbreviatedOid": "612aa7b"
+          },
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "LGTM",
+          "createdAt": "2022-04-21T00:04:18Z",
+          "updatedAt": "2022-04-21T00:10:55Z",
+          "comments": [
+            {
+              "originalPosition": 8,
+              "body": "This TODO should probably wait until AMBI went through last call I think? Any security reviews for AMBI would obviously also be very helpful for this. I also opened another [issue](https://github.com/GrumpyOldTroll/ietf-dorms-cluster/issues/11) recently that might become relevant here eventually (as its specifically concerning the hash algorithm). ",
+              "createdAt": "2022-04-21T00:04:18Z",
+              "updatedAt": "2022-04-21T00:10:55Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG6NyZs44gtEA",
+          "commit": {
+            "abbreviatedOid": "612aa7b"
+          },
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-04-21T06:09:35Z",
+          "updatedAt": "2022-04-21T06:09:35Z",
+          "comments": [
+            {
+              "originalPosition": 8,
+              "body": "Yes, something like that. Ultimately I think a decent description of what this is protecting against probably belongs somewhere in this doc, so I thought I'd leave a placeholder.  Agreed there's a good chance reviews on AMBI will likely impact this.",
+              "createdAt": "2022-04-21T06:09:35Z",
+              "updatedAt": "2022-04-21T06:09:35Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "id": "PR_kwDOG6NyZs42heGh",
+      "title": "attempt at fixing #3 and #4",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/8",
+      "state": "MERGED",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2022-04-20T23:02:37Z",
+      "updatedAt": "2022-04-21T15:22:08Z",
+      "baseRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "baseRefName": "main",
+      "baseRefOid": "d249bc0faa2309e91d63530012096dd3e0bf9c1a",
+      "headRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "headRefName": "issue-4",
+      "headRefOid": "63b59b6058e9e00aa7f261fc478575dde0b19a78",
+      "closedAt": "2022-04-21T15:22:02Z",
+      "mergedAt": "2022-04-21T15:22:02Z",
+      "mergedBy": "GrumpyOldTroll",
+      "mergeCommit": {
+        "oid": "58475021be53111f46e1fd7bf52c0392efa02379"
+      },
+      "comments": [
+        {
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Also about the failed checks, there is already a [PR against Martins Repo](https://github.com/martinthomson/i-d-template/pull/325). Apparently its because of a GitHub [security vulnerability.](https://github.blog/2022-04-12-git-security-vulnerability-announced/) ",
+          "createdAt": "2022-04-21T00:29:49Z",
+          "updatedAt": "2022-04-21T00:29:49Z"
+        },
+        {
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "body": "LGTM now, thanks! ",
+          "createdAt": "2022-04-21T07:58:09Z",
+          "updatedAt": "2022-04-21T07:58:09Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOG6NyZs44f635",
+          "commit": {
+            "abbreviatedOid": "97186e2"
+          },
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "Two (minor?) points, but definitely a lot clearer than before, thanks!",
+          "createdAt": "2022-04-20T23:40:54Z",
+          "updatedAt": "2022-04-20T23:52:40Z",
+          "comments": [
+            {
+              "originalPosition": 9,
+              "body": "This isn't technically a new addition but I just noticed it, what kind of server do you mean when you speak of \"many servers\"? I assume its QUIC servers (processes)? The way its phrased now sounds a bit like it could describe ASM (many-to-many), which I am aware is not the intention. ",
+              "createdAt": "2022-04-20T23:40:54Z",
+              "updatedAt": "2022-04-20T23:52:40Z"
+            },
+            {
+              "originalPosition": 21,
+              "body": "How can a client differentiate if a packet belongs to a session or a connection if both use the same ID space? There should probably be a mechanic to force clients to not use some connection IDs for unicast connections. I think only doing it in the MC_SESSION_PROPERTIES frame is too late, it should probably be done immediately after the handshake of the unicast connection. Its basically a frame telling the client \"Do not use any of these connection IDs for your unicast streams as we might have a multicast session that uses this ID. If you (by sheer bad luck) already use one of them for a unicast connection (i.e. the initially created one), issue a new connection ID and retire the old one immediately.\" ",
+              "createdAt": "2022-04-20T23:49:55Z",
+              "updatedAt": "2022-04-20T23:52:40Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG6NyZs44gU2L",
+          "commit": {
+            "abbreviatedOid": "97186e2"
+          },
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-04-21T03:09:59Z",
+          "updatedAt": "2022-04-21T03:09:59Z",
+          "comments": [
+            {
+              "originalPosition": 21,
+              "body": "That is a very good idea on a problem that has been bugging me.  I was thinking to do it by the receive path, but I like your idea better.\r\n\r\nI guess session properties should implicitly reserve the session id, but also a MC_RESERVE_SESSIONIDS frame to reserve a list of IDs without sending their properties.\r\n\r\nI think if there is a collision it doesn't matter until the server issues a JOIN, but if the client has not yet migrated connection ID it can refuse the join with an \"ID Collision\" reason and we don't really need other signaling about it I think?  Actually it occurs to me the server should already know if the connection ID is in use, and can determine when it has closed to retry the join?",
+              "createdAt": "2022-04-21T03:09:59Z",
+              "updatedAt": "2022-04-21T03:09:59Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG6NyZs44gkML",
+          "commit": {
+            "abbreviatedOid": "97186e2"
+          },
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-04-21T05:26:49Z",
+          "updatedAt": "2022-04-21T05:26:49Z",
+          "comments": [
+            {
+              "originalPosition": 21,
+              "body": "Made a new issue (#9) for this point, that'll be a separate PR.",
+              "createdAt": "2022-04-21T05:26:49Z",
+              "updatedAt": "2022-04-21T05:26:49Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 17,
+      "id": "PR_kwDOG6NyZs426Kbm",
+      "title": "First attempt at stateless resets",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/17",
+      "state": "MERGED",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Would close #15 ",
+      "createdAt": "2022-04-28T00:05:02Z",
+      "updatedAt": "2022-05-02T18:06:34Z",
+      "baseRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "baseRefName": "main",
+      "baseRefOid": "234520ec2304bb110e8f8268de40bdb6f75ed3d0",
+      "headRepository": "MaxF12/draft-jholland-quic-multicast",
+      "headRefName": "issue15",
+      "headRefOid": "9f7b3a5bc7b8235494c16c0028fc1d5c7b7ca6cd",
+      "closedAt": "2022-05-02T18:06:34Z",
+      "mergedAt": "2022-05-02T18:06:34Z",
+      "mergedBy": "GrumpyOldTroll",
+      "mergeCommit": {
+        "oid": "e266f4c5837f6331af1254b50b48fb38f197560f"
+      },
+      "comments": [
+        {
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Reworded the section a bit again and added spurious traffic as a reason for leaving. Also note that I used (S,G), but that might change depending on #23.",
+          "createdAt": "2022-04-30T01:27:24Z",
+          "updatedAt": "2022-04-30T01:28:56Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOG6NyZs45DNO9",
+          "commit": {
+            "abbreviatedOid": "416bda9"
+          },
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "state": "CHANGES_REQUESTED",
+          "body": "",
+          "createdAt": "2022-04-28T23:33:30Z",
+          "updatedAt": "2022-04-28T23:34:05Z",
+          "comments": [
+            {
+              "originalPosition": 7,
+              "body": "I think this might be too strong.  An attack that injects a packet with a bad session id could cause everyone to leave.\r\n\r\nThat said, if there's a lot of traffic with an unknown session id arriving on a network path, I do think it's appropriate to leave, perhaps with a MAY, or with a SHOULD if it's above some threshold (not sure if we need it, but server could perhaps set a recommended threshold in session properties if we do?).  But I think this should be less about issuing an IGMP membership report and more like \"the client leaves the session(s) corresponding to the network path receiving excessive traffic with unknown session IDs with a leave reason of 'excessive spurious traffic'.\"",
+              "createdAt": "2022-04-28T23:33:30Z",
+              "updatedAt": "2022-04-28T23:34:05Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG6NyZs45DUvi",
+          "commit": {
+            "abbreviatedOid": "416bda9"
+          },
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-04-29T00:55:28Z",
+          "updatedAt": "2022-04-29T00:55:28Z",
+          "comments": [
+            {
+              "originalPosition": 7,
+              "body": "I agree with the first part, good point thanks. I think it might be ok to say that it is the Group Address that can't be associated with any channel since the Endpoint should know all group addresses it expects traffic on. \r\n\r\nAs for the second part, as far as I understand stateless resets, it is for cases where the client loses all state so it might not know which the corresponding unicast connection is or it might lose that connection all together as well. I think the point is to just stop the sending/forwarding/receiving of useless data to not waste resources unnecessarily. (I think that's why stateless reset tokens can be generated from scratch if the only thing known is the connection ID for which to issue the stateless reset token). ",
+              "createdAt": "2022-04-29T00:55:28Z",
+              "updatedAt": "2022-04-29T00:56:13Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG6NyZs45DWBF",
+          "commit": {
+            "abbreviatedOid": "70773bd"
+          },
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-04-29T01:12:31Z",
+          "updatedAt": "2022-04-29T01:19:11Z",
+          "comments": [
+            {
+              "originalPosition": 7,
+              "body": "Almost there, but I'll suggest:\r\n\r\nOLD:\r\n~~~\r\nAs clients can unilaterally stop the delivery of multicast packets by leaving the\r\nrelevant Group, channels do not need stateless reset tokens.\r\nInstead, if an endpoint receives packets addressed to a group IP that it can not\r\nassociate with any existing channel, it MAY take the necessary steps to prevent\r\nthe reception of further such packets. For example, it might issue an IGMP or\r\nMLD report indicating a desire to leave the (S,G) associated with the unwanted\r\npacket.\r\n~~~\r\n\r\nNEW:\r\n~~~\r\nAs clients can unilaterally stop the delivery of multicast packets by leaving\r\nchannels associated with network paths that receive traffic with unknown\r\nChannel IDs, channels do not need stateless reset tokens.\r\nInstead, if an endpoint receives packets addressed to a group IP that it can\r\nnot associate with any existing channel, it MAY leave channels using that\r\ngroup IP with reason \"spurious traffic\".\r\n~~~\r\n\r\nI think it's roughly equivalent in the end result, but I'm trying to talk in terms of the quic channel associated with the network path instead of the IP multicast group to the extent possible.\r\n\r\nAlso maybe as a separate but related matter we should clarify somewhere that the client MUST (or just SHOULD?) notify the server with a MC_CLIENT_CHANNEL_STATE frame when it joins and leaves channels associated with addresses of defined quic channels?  (The OLD text seems to indicate just stopping the receive at the IGMP/UDP layer without sending the MC_CLIENT_CHANNEL_STATE frame would be reasonable, and while that will eventually hit the max_idle, I don't think it's a good practice and shouldn't be encouraged--they should do a proper quic leave of the channel IMO.)\r\n\r\nAlso worth noting that I'm using plural here on purpose--maybe this points to another thing that (as another separate but loosely related matter) should get some text on how to handle it when there's colliding network paths among the channels?  If that makes any sense I guess we can make an issue about it...\r\n - Note that there's actually a use case for permitting (S,G) collisions: it's useful to deliver integrity frames for your data channel on a different quic channel that uses the same (S,G) (with or without being a different UDP port), because it uses the same routing for both channels so there's fate-sharing for the integrity and data trafic, and that can give a bunch of benefit to the scalability by shipping the integrity traffic over multicast.",
+              "createdAt": "2022-04-29T01:12:32Z",
+              "updatedAt": "2022-04-29T01:19:11Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG6NyZs45LwoV",
+          "commit": {
+            "abbreviatedOid": "9f7b3a5"
+          },
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "I think that's a good start, thanks.",
+          "createdAt": "2022-05-02T18:06:25Z",
+          "updatedAt": "2022-05-02T18:06:25Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 18,
+      "id": "PR_kwDOG6NyZs426Kjc",
+      "title": "Add ACK Bundle Size",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/18",
+      "state": "MERGED",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Some minor things I notice while reading and first attempt at adding ACK bundle size.\r\nWould close #11 ",
+      "createdAt": "2022-04-28T00:06:04Z",
+      "updatedAt": "2022-04-28T23:19:53Z",
+      "baseRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "baseRefName": "main",
+      "baseRefOid": "67bf5b0c186fcd3e0fb6a9b1fa8d889c879bf524",
+      "headRepository": "MaxF12/draft-jholland-quic-multicast",
+      "headRefName": "issue11",
+      "headRefOid": "a8d99e31424b377bf961a33b42ccd40a02ce562a",
+      "closedAt": "2022-04-28T23:19:53Z",
+      "mergedAt": "2022-04-28T23:19:53Z",
+      "mergedBy": "GrumpyOldTroll",
+      "mergeCommit": {
+        "oid": "4a605542f752ba1b3c490966c5e1915a37669066"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOG6NyZs45DLpx",
+          "commit": {
+            "abbreviatedOid": "a8d99e3"
+          },
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "LGTM, a very fine start.",
+          "createdAt": "2022-04-28T23:19:37Z",
+          "updatedAt": "2022-04-28T23:19:37Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 19,
+      "id": "PR_kwDOG6NyZs429Ijz",
+      "title": "Some suggested fixes",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/19",
+      "state": "MERGED",
+      "author": "samhurst",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Thanks for the good document, I think it's a great start. I've got some minor fixes, including some typo corrections and a couple of attempts at rewording some sections that were difficult to parse. Let me know what you think.",
+      "createdAt": "2022-04-28T15:21:38Z",
+      "updatedAt": "2022-04-28T23:45:40Z",
+      "baseRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "baseRefName": "main",
+      "baseRefOid": "67bf5b0c186fcd3e0fb6a9b1fa8d889c879bf524",
+      "headRepository": "samhurst/draft-jholland-quic-multicast",
+      "headRefName": "main",
+      "headRefOid": "737e2bbf6d3716df0fa3cf6f23dece8c1a66f12a",
+      "closedAt": "2022-04-28T23:45:40Z",
+      "mergedAt": "2022-04-28T23:45:40Z",
+      "mergedBy": "GrumpyOldTroll",
+      "mergeCommit": {
+        "oid": "737e2bbf6d3716df0fa3cf6f23dece8c1a66f12a"
+      },
+      "comments": [
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "Thanks for the helpful comments and fixes, they LGTM.",
+          "createdAt": "2022-04-28T23:35:06Z",
+          "updatedAt": "2022-04-28T23:35:06Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 20,
+      "id": "PR_kwDOG6NyZs42-7XM",
+      "title": "attempted fix for issue #10 (session has a meaning via TLS)",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/20",
+      "state": "MERGED",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2022-04-28T23:04:13Z",
+      "updatedAt": "2022-04-29T00:21:03Z",
+      "baseRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "baseRefName": "main",
+      "baseRefOid": "8a786ee3b34a4620b9d6b0513f04780f60b70f67",
+      "headRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "headRefName": "issue-10",
+      "headRefOid": "987d43fddc5d1b2731b4e47dff8c62eb7d74f193",
+      "closedAt": "2022-04-29T00:14:09Z",
+      "mergedAt": "2022-04-29T00:14:09Z",
+      "mergedBy": "GrumpyOldTroll",
+      "mergeCommit": {
+        "oid": "234520ec2304bb110e8f8268de40bdb6f75ed3d0"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 22,
+      "id": "PR_kwDOG6NyZs42_OPT",
+      "title": "fix issue #21: changed channel id encodings, plus frame spec ending nits",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/22",
+      "state": "MERGED",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2022-04-29T00:38:38Z",
+      "updatedAt": "2022-04-30T01:26:22Z",
+      "baseRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "baseRefName": "main",
+      "baseRefOid": "234520ec2304bb110e8f8268de40bdb6f75ed3d0",
+      "headRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "headRefName": "issue-21",
+      "headRefOid": "c18843dd8d5b8105953c4e08846cdb5108a7c873",
+      "closedAt": "2022-04-30T01:26:22Z",
+      "mergedAt": "2022-04-30T01:26:22Z",
+      "mergedBy": "MaxF12",
+      "mergeCommit": {
+        "oid": "251bc98efbdaa9aa0754677629b3260163f5b15b"
+      },
+      "comments": [
+        {
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "body": "LGTM.",
+          "createdAt": "2022-04-30T01:26:18Z",
+          "updatedAt": "2022-04-30T01:26:18Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 25,
+      "id": "PR_kwDOG6NyZs43KXDj",
+      "title": "Adding part about maintaining forward secrecy",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/25",
+      "state": "MERGED",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #2 ",
+      "createdAt": "2022-05-02T11:30:37Z",
+      "updatedAt": "2022-05-02T18:08:11Z",
+      "baseRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "baseRefName": "main",
+      "baseRefOid": "251bc98efbdaa9aa0754677629b3260163f5b15b",
+      "headRepository": "MaxF12/draft-jholland-quic-multicast",
+      "headRefName": "issue2",
+      "headRefOid": "f215e6d287bb46026c00994ada7bc61d6e76af15",
+      "closedAt": "2022-05-02T18:08:11Z",
+      "mergedAt": "2022-05-02T18:08:11Z",
+      "mergedBy": "GrumpyOldTroll",
+      "mergeCommit": {
+        "oid": "54c778e0460c05284e1c76fdf69c01a5456c699a"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOG6NyZs45LxA-",
+          "commit": {
+            "abbreviatedOid": "f215e6d"
+          },
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "Sure, that works ok.  Thanks.",
+          "createdAt": "2022-05-02T18:08:04Z",
+          "updatedAt": "2022-05-02T18:08:04Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 30,
+      "id": "PR_kwDOG6NyZs43NLqH",
+      "title": "Issue #27 (frame spec cleanup)",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/30",
+      "state": "MERGED",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "(NB: I think this matches the implemented frames so far, did the work in parallel)",
+      "createdAt": "2022-05-03T03:53:38Z",
+      "updatedAt": "2022-05-04T18:56:36Z",
+      "baseRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "baseRefName": "main",
+      "baseRefOid": "54c778e0460c05284e1c76fdf69c01a5456c699a",
+      "headRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "headRefName": "issue-27",
+      "headRefOid": "f4749bf67c1b10b73039edae9d02c7a30341a8da",
+      "closedAt": "2022-05-04T18:56:35Z",
+      "mergedAt": "2022-05-04T18:56:35Z",
+      "mergedBy": "MaxF12",
+      "mergeCommit": {
+        "oid": "c034471c47b3f344e0dbe9add4336d2b6cb32482"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOG6NyZs45PtTY",
+          "commit": {
+            "abbreviatedOid": "7b8a648"
+          },
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "LGTM, some nits. Though I still think the transport parameter format should be the same as the client_limits frame ( replace Permit IPv4/6 and the reserved with capabilities flag) ",
+          "createdAt": "2022-05-03T13:50:10Z",
+          "updatedAt": "2022-05-04T00:04:10Z",
+          "comments": [
+            {
+              "originalPosition": 24,
+              "body": "I think this should be an (8) \r\nPer RFC 9000: \r\n`NEW_CONNECTION_ID Frame {\r\n  Type (i) = 0x18,\r\n  Sequence Number (i),\r\n  Retire Prior To (i),\r\n  Length (8),\r\n  Connection ID (8..160),\r\n  Stateless Reset Token (128),\r\n}`",
+              "createdAt": "2022-05-03T13:50:10Z",
+              "updatedAt": "2022-05-04T00:04:10Z"
+            },
+            {
+              "originalPosition": 52,
+              "body": "I think the notation of these might be off, in RFC 9000 three dots indicates a repetition iirc, I think you just want two here. \r\nRFC9000:\r\n`  Arbitrary-Length Field (..)`",
+              "createdAt": "2022-05-03T13:55:58Z",
+              "updatedAt": "2022-05-04T00:04:10Z"
+            },
+            {
+              "originalPosition": 89,
+              "body": "I guess there is one field where no prior value is necessarily known, which is (surprise surprise) source IP in case ASM is used. So I guess this isn't generally true and there needs to be an exception to this rule for that one field. \r\nBut to me it sounds like just another hassle that gets removed by not supporting ASM.",
+              "createdAt": "2022-05-03T23:52:30Z",
+              "updatedAt": "2022-05-04T00:04:10Z"
+            },
+            {
+              "originalPosition": 24,
+              "body": "This is possibly true in several places in this PR",
+              "createdAt": "2022-05-03T23:59:04Z",
+              "updatedAt": "2022-05-04T00:04:10Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG6NyZs45WyBK",
+          "commit": {
+            "abbreviatedOid": "7b8a648"
+          },
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-04T17:59:33Z",
+          "updatedAt": "2022-05-04T17:59:34Z",
+          "comments": [
+            {
+              "originalPosition": 89,
+              "body": "Yes, I think stripping ASM as a separate PR will clean this up.  Good point. (resolving this since we decided to strip out ASM).",
+              "createdAt": "2022-05-04T17:59:33Z",
+              "updatedAt": "2022-05-04T18:01:48Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG6NyZs45WyXd",
+          "commit": {
+            "abbreviatedOid": "7b8a648"
+          },
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-04T18:00:51Z",
+          "updatedAt": "2022-05-04T18:00:51Z",
+          "comments": [
+            {
+              "originalPosition": 24,
+              "body": "Thanks, good catch. New update fixes it I think.",
+              "createdAt": "2022-05-04T18:00:51Z",
+              "updatedAt": "2022-05-04T18:00:51Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG6NyZs45Wycm",
+          "commit": {
+            "abbreviatedOid": "7b8a648"
+          },
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-04T18:01:08Z",
+          "updatedAt": "2022-05-04T18:01:08Z",
+          "comments": [
+            {
+              "originalPosition": 52,
+              "body": "Thanks, good catch.  New update fixes it I think.",
+              "createdAt": "2022-05-04T18:01:08Z",
+              "updatedAt": "2022-05-04T18:01:08Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 31,
+      "id": "PR_kwDOG6NyZs43Q_GC",
+      "title": "Add MC_RESERVE_CHANNEL_IDS frame",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/31",
+      "state": "OPEN",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #9 ",
+      "createdAt": "2022-05-04T02:55:14Z",
+      "updatedAt": "2022-05-05T17:11:53Z",
+      "baseRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "baseRefName": "main",
+      "baseRefOid": "466873a695c997e960749f56059874aade65589d",
+      "headRepository": "MaxF12/draft-jholland-quic-multicast",
+      "headRefName": "issue9",
+      "headRefOid": "9c8598487ddcc95ec374c203ffe4f4c86110a16a",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "body": "This might need a second list with the lengths of the channel IDs, which seemed a bit awkward but I guess it\u2019s necessary? ",
+          "createdAt": "2022-05-04T03:23:10Z",
+          "updatedAt": "2022-05-04T03:23:10Z"
+        },
+        {
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Gave it a shot to split the properties frame as well now to maybe make it more straight forward and use the new frame as not only reservation of a Channel ID but also to communicate all the static properties of a channel (into two for now, splitting keys out could also come later)",
+          "createdAt": "2022-05-05T00:11:09Z",
+          "updatedAt": "2022-05-05T00:11:09Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOG6NyZs45WM6v",
+          "commit": {
+            "abbreviatedOid": "e425a3d"
+          },
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-04T16:02:39Z",
+          "updatedAt": "2022-05-04T16:02:40Z",
+          "comments": [
+            {
+              "originalPosition": 15,
+              "body": "I think a list of { Length, ChannelID } structures is probably better.  There's an existing [WriteLengthPrefixedConnectionId](https://github.com/GrumpyOldTroll/quiche/blob/jake-demo-branch/quic/core/quic_data_writer.h#L88) function that can be used if it's structured that way.",
+              "createdAt": "2022-05-04T16:02:40Z",
+              "updatedAt": "2022-05-04T16:02:40Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG6NyZs45WN9_",
+          "commit": {
+            "abbreviatedOid": "e425a3d"
+          },
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-04T16:05:51Z",
+          "updatedAt": "2022-05-04T16:05:52Z",
+          "comments": [
+            {
+              "originalPosition": 15,
+              "body": "I guess another option is a separate frame per reserved channel id, like with opening streams or something.  The size overhead you can save by batching them is pretty marginal I think, and comes with complexity if it gets too big for a packet.",
+              "createdAt": "2022-05-04T16:05:51Z",
+              "updatedAt": "2022-05-04T16:05:52Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG6NyZs45WoSH",
+          "commit": {
+            "abbreviatedOid": "e425a3d"
+          },
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-04T17:26:22Z",
+          "updatedAt": "2022-05-04T17:26:22Z",
+          "comments": [
+            {
+              "originalPosition": 15,
+              "body": "Right, good point about the fragmentation and list format. I guess another option would be to just have a range of reserved channels, so something like\r\n\r\n```\r\nLength start (8),\r\nStart channel ID (8..160),\r\nLength end (8),\r\nEnd channel ID (8..160),\r\n\r\n```\r\nI guess the question is if there is any serious reason why a server would want to have several entirely separate ranges of channel IDs? Or maybe you just allow to send several of those frames, in cases where it is really required? ",
+              "createdAt": "2022-05-04T17:26:22Z",
+              "updatedAt": "2022-05-04T17:26:38Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG6NyZs45Y2hW",
+          "commit": {
+            "abbreviatedOid": "58fc92e"
+          },
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-05T02:50:50Z",
+          "updatedAt": "2022-05-05T03:25:45Z",
+          "comments": [
+            {
+              "originalPosition": 46,
+              "body": "They can still arrive out of order, so I'm not sure what this accomplishes...  Might as well add all the property fields too I guess?",
+              "createdAt": "2022-05-05T02:50:50Z",
+              "updatedAt": "2022-05-05T03:25:45Z"
+            },
+            {
+              "originalPosition": 16,
+              "body": "Other things with a single bit-field generally it as the last bit in the frame type, making 2 frame types with 1 thing different between them.  Maybe appropriate here?",
+              "createdAt": "2022-05-05T02:57:56Z",
+              "updatedAt": "2022-05-05T03:25:45Z"
+            },
+            {
+              "originalPosition": 46,
+              "body": "With a 32-byte key and IPv6 I get 124 bytes for this frame, so maybe it's too long for that.  hmm.",
+              "createdAt": "2022-05-05T02:59:37Z",
+              "updatedAt": "2022-05-05T03:25:45Z"
+            },
+            {
+              "originalPosition": 46,
+              "body": "Plus ~90 for the properties as a max size.  Hmm..., not many of these sets per packet.  I guess we probably do need the reservation if we're doing it this way.",
+              "createdAt": "2022-05-05T03:09:54Z",
+              "updatedAt": "2022-05-05T03:25:45Z"
+            },
+            {
+              "originalPosition": 176,
+              "body": "suggest replacing from \"SHOULD ...\" with: \"SHOULD NOT send properties for channels except those the client has joined or will be imminently asked to join.\"",
+              "createdAt": "2022-05-05T03:22:34Z",
+              "updatedAt": "2022-05-05T03:25:45Z"
+            },
+            {
+              "originalPosition": 182,
+              "body": "Suggest adding:\r\nIf a client receives a MC_CHANNEL_JOIN for a channel for which it has not received both, it MUST respond with a MC_CLIENT_CHANNEL_STATE with State \"Declined Join\" and reason \"Missing Properties\".  The server MAY send another MC_CHANNEL_JOIN after retransmitting the MC_CHANNEL_PROPERTIES and receiving an acknowledgement indicating receipt of the MC_CHANNEL_ANNOUNCE.",
+              "createdAt": "2022-05-05T03:25:13Z",
+              "updatedAt": "2022-05-05T03:25:45Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG6NyZs45bkJ8",
+          "commit": {
+            "abbreviatedOid": "58fc92e"
+          },
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-05T15:10:48Z",
+          "updatedAt": "2022-05-05T15:10:48Z",
+          "comments": [
+            {
+              "originalPosition": 46,
+              "body": "Yeah, the initial frames are quite large, I got around 204(90 announce+114 properties) Bytes combined for properties and announce in a worst case. That assumes a 20 Byte channel ID (it might make sense to add a recommendation to use low channel ids to decrease the size, since they are used in a lot of frames). The issue is that all the parameters have to get to the client before the join one way or another (though I think there might actually be the case where a client could already join just from the announce frame, it could join the multicast channel and create the tree and so on, just couldn't decrypt/ integrity check the packets it receives. Though that is probably too complicated again), but I think that by having it split this way the server could first send at least 10 or so announce frames in a packet which serve as the reservation and then follow it up with properties (and joins) in the next two packets. I think with your suggested addition of the decline_join when either frame is missing we should be good if they arrive out of order, and you're right there isn't much point to a MUST there, so I changed it to a SHOULD. \r\n\r\nI guess this is somewhere where some implementation experience will be good to see how much of a delay this causes. ",
+              "createdAt": "2022-05-05T15:10:48Z",
+              "updatedAt": "2022-05-05T15:15:29Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 37,
+      "id": "PR_kwDOG6NyZs43UQ-M",
+      "title": "Clarify that only SSM is supported",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/37",
+      "state": "MERGED",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #23. ",
+      "createdAt": "2022-05-04T20:30:25Z",
+      "updatedAt": "2022-05-05T04:12:23Z",
+      "baseRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "baseRefName": "main",
+      "baseRefOid": "c034471c47b3f344e0dbe9add4336d2b6cb32482",
+      "headRepository": "MaxF12/draft-jholland-quic-multicast",
+      "headRefName": "issue23",
+      "headRefOid": "928eddd8563b3a8322a1f39b25efd4ca812948cd",
+      "closedAt": "2022-05-05T04:12:22Z",
+      "mergedAt": "2022-05-05T04:12:22Z",
+      "mergedBy": "GrumpyOldTroll",
+      "mergeCommit": {
+        "oid": "466873a695c997e960749f56059874aade65589d"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOG6NyZs45Y8TT",
+          "commit": {
+            "abbreviatedOid": "928eddd"
+          },
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "LGTM",
+          "createdAt": "2022-05-05T04:12:15Z",
+          "updatedAt": "2022-05-05T04:12:15Z",
+          "comments": []
+        }
+      ]
+    }
+  ]
+}
