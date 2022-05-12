@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-05-08T00:27:16.546188+00:00",
+  "timestamp": "2022-05-12T00:28:55.617298+00:00",
   "repo": "GrumpyOldTroll/draft-jholland-quic-multicast",
   "labels": [
     {
@@ -1447,13 +1447,13 @@
       "labels": [],
       "body": "Closes #9 ",
       "createdAt": "2022-05-04T02:55:14Z",
-      "updatedAt": "2022-05-05T17:11:53Z",
+      "updatedAt": "2022-05-11T19:07:28Z",
       "baseRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
       "baseRefName": "main",
       "baseRefOid": "466873a695c997e960749f56059874aade65589d",
       "headRepository": "MaxF12/draft-jholland-quic-multicast",
       "headRefName": "issue9",
-      "headRefOid": "9c8598487ddcc95ec374c203ffe4f4c86110a16a",
+      "headRefOid": "acc58cb05a0640079f1ad7f2468bb9a96eb8d23f",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
