@@ -5,7 +5,10 @@
 QUIC Working Group                                            J. Holland
 Internet-Draft                                 Akamai Technologies, Inc.
 Intended status: Experimental                                  L. Pardue
-Expires: 14 November 2022                                    13 May 2022
+Expires: 14 November 2022                                               
+                                                               M. Franke
+                                                               TU Berlin
+                                                             13 May 2022
 
 
                       Multicast Extension for QUIC
@@ -1148,3 +1151,8 @@ Authors' Addresses
 
    Lucas Pardue
    Email: lucaspardue.24.7@gmail.com
+
+
+   Max Franke
+   TU Berlin
+   Email: mfranke@inet.tu-berlin.de
