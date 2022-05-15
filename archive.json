@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-05-12T00:28:55.617298+00:00",
+  "timestamp": "2022-05-15T00:39:10.686714+00:00",
   "repo": "GrumpyOldTroll/draft-jholland-quic-multicast",
   "labels": [
     {
@@ -273,7 +273,7 @@
       "id": "I_kwDOG6NyZs5IJvdE",
       "title": "Add something like a MC_RESERVE_SESSIONIDS frame.",
       "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/9",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "GrumpyOldTroll",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -282,8 +282,8 @@
       "labels": [],
       "body": "From Max in issue #4 comment:\r\nhttps://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/8#discussion_r854656985\r\n\r\nThere should probably be a mechanic to force clients to not use some connection IDs for unicast connections. I think only doing it in the MC_SESSION_PROPERTIES frame is too late, it should probably be done immediately after the handshake of the unicast connection. Its basically a frame telling the client \"Do not use any of these connection IDs for your unicast streams as we might have a multicast session that uses this ID. If you (by sheer bad luck) already use one of them for a unicast connection (i.e. the initially created one), issue a new connection ID and retire the old one immediately.\"",
       "createdAt": "2022-04-21T05:26:02Z",
-      "updatedAt": "2022-05-04T17:42:12Z",
-      "closedAt": null,
+      "updatedAt": "2022-05-13T15:41:18Z",
+      "closedAt": "2022-05-13T15:41:18Z",
       "comments": [
         {
           "author": "GrumpyOldTroll",
@@ -1440,24 +1440,26 @@
       "id": "PR_kwDOG6NyZs43Q_GC",
       "title": "Add MC_RESERVE_CHANNEL_IDS frame",
       "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/31",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "MaxF12",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Closes #9 ",
       "createdAt": "2022-05-04T02:55:14Z",
-      "updatedAt": "2022-05-11T19:07:28Z",
+      "updatedAt": "2022-05-13T15:41:18Z",
       "baseRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
       "baseRefName": "main",
       "baseRefOid": "466873a695c997e960749f56059874aade65589d",
       "headRepository": "MaxF12/draft-jholland-quic-multicast",
       "headRefName": "issue9",
       "headRefOid": "acc58cb05a0640079f1ad7f2468bb9a96eb8d23f",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2022-05-13T15:41:18Z",
+      "mergedAt": "2022-05-13T15:41:18Z",
+      "mergedBy": "GrumpyOldTroll",
+      "mergeCommit": {
+        "oid": "399ac7e142888dbcc2ba0402ca69a60dce39bedf"
+      },
       "comments": [
         {
           "author": "MaxF12",
