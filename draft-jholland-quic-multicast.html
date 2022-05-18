@@ -1660,18 +1660,20 @@ If the client does not join, it MUST send a MC_CLIENT_CHANNEL_STATE with "Declin
         <h3 id="name-mc_channel_leave">
 <a href="#section-11.4" class="section-number selfRef">11.4. </a><a href="#name-mc_channel_leave" class="section-name selfRef">MC_CHANNEL_LEAVE</a>
         </h3>
-<p id="section-11.4-1">An MC_CHANNEL_LEAVE frame (type=TBD-03) is sent from server to client
-in either the unicast connection or a channel.<a href="#section-11.4-1" class="pilcrow">¶</a></p>
-<p id="section-11.4-2">MC_CHANNEL_LEAVE frames are formatted as shown in <a href="#fig-mc-channel-leave-format" class="xref">Figure 5</a>.<a href="#section-11.4-2" class="pilcrow">¶</a></p>
+<p id="section-11.4-1">An MC_CHANNEL_LEAVE frame (type=TBD-03) is sent from server to client, and requests that a client leave the given channel.<a href="#section-11.4-1" class="pilcrow">¶</a></p>
+<p id="section-11.4-2">If the client has already left or declined to join the channel, the MC_CHANNEL_LEAVE is ignored.<a href="#section-11.4-2" class="pilcrow">¶</a></p>
+<p id="section-11.4-3">If a MC_CHANNEL_JOIN or an MC_CHANNEL_LEAVE with the same Channel ID and a higher MC_CLIENT_CHANNEL_STATE Sequence number has previously been received, the MC_CHANNEL_LEAVE is ignored.<a href="#section-11.4-3" class="pilcrow">¶</a></p>
+<p id="section-11.4-4">Otherwise, the client MUST leave the channel and send a new MC_CLIENT_CHANNEL_STATE frame with reason Left as requested by server.<a href="#section-11.4-4" class="pilcrow">¶</a></p>
+<p id="section-11.4-5">MC_CHANNEL_LEAVE frames are formatted as shown in <a href="#fig-mc-channel-leave-format" class="xref">Figure 5</a>.<a href="#section-11.4-5" class="pilcrow">¶</a></p>
 <span id="name-mc_channel_leave-frame-form"></span><div id="fig-mc-channel-leave-format">
 <figure id="figure-5">
-          <div class="alignLeft art-text artwork" id="section-11.4-3.1">
+          <div class="alignLeft art-text artwork" id="section-11.4-6.1">
 <pre>
 MC_CHANNEL_LEAVE Frame {
   Type (i) = TBD-03 (experiments use 0xff3e803),
-  MC_CLIENT_CHANNEL_STATE Sequence Number (i),
   ID Length (8),
   Channel ID (8..160),
+  MC_CLIENT_CHANNEL_STATE Sequence Number (i),
   After Packet Number (i)
 }
 </pre>
@@ -1680,7 +1682,7 @@ MC_CHANNEL_LEAVE Frame {
 <a href="#name-mc_channel_leave-frame-form" class="selfRef">MC_CHANNEL_LEAVE Frame Format</a>
           </figcaption></figure>
 </div>
-<p id="section-11.4-4">If After Packet Number is nonzero, wait until receiving that packet or a higher valued number before leaving.<a href="#section-11.4-4" class="pilcrow">¶</a></p>
+<p id="section-11.4-7">If After Packet Number is nonzero, wait until receiving that packet or a higher valued number before leaving.<a href="#section-11.4-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="channel-integrity-frame">
@@ -1839,10 +1841,13 @@ MC_CHANNEL_RETIRE Frame {
         <h3 id="name-mc_client_channel_state">
 <a href="#section-11.10" class="section-number selfRef">11.10. </a><a href="#name-mc_client_channel_state" class="section-name selfRef">MC_CLIENT_CHANNEL_STATE</a>
         </h3>
-<p id="section-11.10-1">MC_CLIENT_CHANNEL_STATE frames are formatted as shown in <a href="#fig-mc-client-channel-state-format" class="xref">Figure 11</a>.<a href="#section-11.10-1" class="pilcrow">¶</a></p>
+<p id="section-11.10-1">MC_CLIENT_CHANNEL_STATE frames are sent from client to server to report changes in the client's channel state.
+Each time the channel state changes, the Client Channel State Sequence number is increased by one.
+It is a state change to the channel if the server requests that a client join a channel and the client declines the join, even though no join occurs on the network.<a href="#section-11.10-1" class="pilcrow">¶</a></p>
+<p id="section-11.10-2">MC_CLIENT_CHANNEL_STATE frames are formatted as shown in <a href="#fig-mc-client-channel-state-format" class="xref">Figure 11</a>.<a href="#section-11.10-2" class="pilcrow">¶</a></p>
 <span id="name-mc_client_channel_state-fra"></span><div id="fig-mc-client-channel-state-format">
 <figure id="figure-11">
-          <div class="alignLeft art-text artwork" id="section-11.10-2.1">
+          <div class="alignLeft art-text artwork" id="section-11.10-3.1">
 <pre>
 MC_CLIENT_CHANNEL_STATE Frame {
   Type (i) = TBD-0b (experiments use 0xff3e80b),
@@ -1858,50 +1863,50 @@ MC_CLIENT_CHANNEL_STATE Frame {
 <a href="#name-mc_client_channel_state-fra" class="selfRef">MC_CLIENT_CHANNEL_STATE Frame Format</a>
           </figcaption></figure>
 </div>
-<p id="section-11.10-3">State has these defined values:<a href="#section-11.10-3" class="pilcrow">¶</a></p>
+<p id="section-11.10-4">State has these defined values:<a href="#section-11.10-4" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-11.10-4.1">0x1: Left<a href="#section-11.10-4.1" class="pilcrow">¶</a>
+<li class="normal" id="section-11.10-5.1">0x1: Left<a href="#section-11.10-5.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-11.10-4.2">0x2: Declined Join<a href="#section-11.10-4.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-11.10-5.2">0x2: Declined Join<a href="#section-11.10-5.2" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-11.10-4.3">0x3: Joined<a href="#section-11.10-4.3" class="pilcrow">¶</a>
+          <li class="normal" id="section-11.10-5.3">0x3: Joined<a href="#section-11.10-5.3" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-11.10-5">If State is Joined, the Reason field is absent.<a href="#section-11.10-5" class="pilcrow">¶</a></p>
-<p id="section-11.10-6">If State is Left or Declined Join, the Reason field is set to one of:<a href="#section-11.10-6" class="pilcrow">¶</a></p>
+<p id="section-11.10-6">If State is Joined, the Reason field is absent.<a href="#section-11.10-6" class="pilcrow">¶</a></p>
+<p id="section-11.10-7">If State is Left or Declined Join, the Reason field is set to one of:<a href="#section-11.10-7" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-11.10-7.1">0x0: Unspecified Other<a href="#section-11.10-7.1" class="pilcrow">¶</a>
+<li class="normal" id="section-11.10-8.1">0x0: Unspecified Other<a href="#section-11.10-8.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-11.10-7.2">0x1: Left as requested by server<a href="#section-11.10-7.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-11.10-8.2">0x1: Left as requested by server<a href="#section-11.10-8.2" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-11.10-7.3">0x2: Administrative Block<a href="#section-11.10-7.3" class="pilcrow">¶</a>
+          <li class="normal" id="section-11.10-8.3">0x2: Administrative Block<a href="#section-11.10-8.3" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-11.10-7.4">0x3: Protocol Error<a href="#section-11.10-7.4" class="pilcrow">¶</a>
+          <li class="normal" id="section-11.10-8.4">0x3: Protocol Error<a href="#section-11.10-8.4" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-11.10-7.5">0x4: Property Violation<a href="#section-11.10-7.5" class="pilcrow">¶</a>
+          <li class="normal" id="section-11.10-8.5">0x4: Property Violation<a href="#section-11.10-8.5" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-11.10-7.6">0x5: Unsynchronized Properties<a href="#section-11.10-7.6" class="pilcrow">¶</a>
+          <li class="normal" id="section-11.10-8.6">0x5: Unsynchronized Properties<a href="#section-11.10-8.6" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-11.10-7.7">0x6: ID Collision<a href="#section-11.10-7.7" class="pilcrow">¶</a>
+          <li class="normal" id="section-11.10-8.7">0x6: ID Collision<a href="#section-11.10-8.7" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-11.10-7.8">0x10: Held Down<a href="#section-11.10-7.8" class="pilcrow">¶</a>
+          <li class="normal" id="section-11.10-8.8">0x10: Held Down<a href="#section-11.10-8.8" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-11.10-7.9">0x11: Max Idle Time Exceeded<a href="#section-11.10-7.9" class="pilcrow">¶</a>
+          <li class="normal" id="section-11.10-8.9">0x11: Max Idle Time Exceeded<a href="#section-11.10-8.9" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-11.10-7.10">0x12: Max Rate Exceeded<a href="#section-11.10-7.10" class="pilcrow">¶</a>
+          <li class="normal" id="section-11.10-8.10">0x12: Max Rate Exceeded<a href="#section-11.10-8.10" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-11.10-7.11">0x13: High Loss<a href="#section-11.10-7.11" class="pilcrow">¶</a>
+          <li class="normal" id="section-11.10-8.11">0x13: High Loss<a href="#section-11.10-8.11" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-11.10-7.12">0x14: Spurious Traffic<a href="#section-11.10-7.12" class="pilcrow">¶</a>
+          <li class="normal" id="section-11.10-8.12">0x14: Spurious Traffic<a href="#section-11.10-8.12" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-11.10-7.13">0x1000000-0x3fffffff: Application-specific Reason<a href="#section-11.10-7.13" class="pilcrow">¶</a>
+          <li class="normal" id="section-11.10-8.13">0x1000000-0x3fffffff: Application-specific Reason<a href="#section-11.10-8.13" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-11.10-8">A client might receive multicast packets that it can not associate with any channel ID. If these are addressed to an (S,G) that is used for reception in one or more known channels, it MAY leave these channels with reason "Spurious traffic".<a href="#section-11.10-8" class="pilcrow">¶</a></p>
-<p id="section-11.10-9">(TODO: Or should we try to reuse PATH_ABANDON and/or PATH_STATUS?  I don't think they're sufficient, but maybe?):
+<p id="section-11.10-9">A client might receive multicast packets that it can not associate with any channel ID. If these are addressed to an (S,G) that is used for reception in one or more known channels, it MAY leave these channels with reason "Spurious traffic".<a href="#section-11.10-9" class="pilcrow">¶</a></p>
+<p id="section-11.10-10">(TODO: Or should we try to reuse PATH_ABANDON and/or PATH_STATUS?  I don't think they're sufficient, but maybe?):
   - <span>[<a href="#I-D.draft-ietf-quic-multipath" class="xref">I-D.draft-ietf-quic-multipath</a>]</span>
-  - <a href="https://datatracker.ietf.org/doc/html/draft-liu-multipath-quic-04#section-9.1">https://datatracker.ietf.org/doc/html/draft-liu-multipath-quic-04#section-9.1</a><a href="#section-11.10-9" class="pilcrow">¶</a></p>
-<p id="section-11.10-10">The things server needs to know for state changes <em>could</em> maybe be inferred from ack responses but explicit seems better, allowing for a more proactive response under strain?<a href="#section-11.10-10" class="pilcrow">¶</a></p>
+  - <a href="https://datatracker.ietf.org/doc/html/draft-liu-multipath-quic-04#section-9.1">https://datatracker.ietf.org/doc/html/draft-liu-multipath-quic-04#section-9.1</a><a href="#section-11.10-10" class="pilcrow">¶</a></p>
+<p id="section-11.10-11">The things server needs to know for state changes <em>could</em> maybe be inferred from ack responses but explicit seems better, allowing for a more proactive response under strain?<a href="#section-11.10-11" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
