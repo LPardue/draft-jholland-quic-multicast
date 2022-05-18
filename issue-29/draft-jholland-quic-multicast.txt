@@ -363,7 +363,7 @@ Table of Contents
 
    If the client is already joined to a channel that carries streams
    that exceed or will soon exceed the client's unidirectional
-   MAX_STREAMS, the server MUST send a MC_CHANNEL_LEAVE frame.
+   MAX_STREAMS, the server SHOULD send a MC_CHANNEL_LEAVE frame.
 
    If a client receives a STREAM frame with an ID above its MAX_STREAMS
    on a channel, the client MAY increase its unidirectional MAX_STREAMS
@@ -721,16 +721,16 @@ Table of Contents
 
 11.4.  MC_CHANNEL_LEAVE
 
-   An MC_CHANNEL_LEAVE frame (type=TBD-03) is sent from server to
-   client.
+   An MC_CHANNEL_LEAVE frame (type=TBD-03) is sent from server to client
+   in either the unicast connection or a channel.
 
    MC_CHANNEL_LEAVE frames are formatted as shown in Figure 5.
 
    MC_CHANNEL_LEAVE Frame {
      Type (i) = TBD-03 (experiments use 0xff3e803),
-     MC_CLIENT_CHANNEL_STATE Sequence Number (i),
      ID Length (8),
      Channel ID (8..160),
+     MC_CLIENT_CHANNEL_STATE Sequence Number (i),
      After Packet Number (i)
    }
 
@@ -916,6 +916,8 @@ Table of Contents
    *  0x13: High Loss
 
    *  0x14: Spurious Traffic
+
+   *  0x15: Max Streams Exceeded
 
    *  0x1000000-0x3fffffff: Application-specific Reason
 
