@@ -1166,7 +1166,12 @@ svg [stroke="fill"], svg [fill^="#fff"] {
             <p id="section-toc.1-1.8.1"><a href="#section-8" class="xref">8</a>.  <a href="#name-packet-scheduling" class="xref">Packet Scheduling</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#section-9" class="xref">9</a>.  <a href="#name-stateless-reset" class="xref">Stateless Reset</a></p>
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="xref">9</a>.  <a href="#name-connection-termination" class="xref">Connection Termination</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
+                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="xref">9.1</a>.  <a href="#name-stateless-reset" class="xref">Stateless Reset</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
             <p id="section-toc.1-1.10.1"><a href="#section-10" class="xref">10</a>. <a href="#name-implementation-and-operatio" class="xref">Implementation and Operational Considerations</a></p>
@@ -1453,15 +1458,29 @@ Note that the hash is on the unencrypted packet because it checks against a spec
     </h2>
 </section>
 </div>
-<div id="stateless-reset">
+<div id="connection-termination">
 <section id="section-9">
-      <h2 id="name-stateless-reset">
-<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-stateless-reset" class="section-name selfRef">Stateless Reset</a>
+      <h2 id="name-connection-termination">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-connection-termination" class="section-name selfRef">Connection Termination</a>
       </h2>
-<p id="section-9-1">As clients can unilaterally stop the delivery of multicast packets by leaving the relevant (S,G), channels do not need stateless reset tokens.
+<p id="section-9-1">Termination of the unicast connection behaves as described in Section 10 of <span>[<a href="#RFC9000" class="xref">RFC9000</a>]</span>, with the following notable differences:<a href="#section-9-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-9-2.1">On the client side, termination of the unicast connection means that it MUST leave all multicast channels and discard any state associated with them. Servers MAY stop sending to multicast channels if there are no unicast connections left that are associated with them.<a href="#section-9-2.1" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-9-2.2">For determining the liveness of a connection, the client MUST only consider packets received on the unicast connection. Any packets received on a multicast channel MUST NOT be used to reset a timer checking if a potentially specified max_idle_timeout has been reached. If the unicast connection becomes idle and the server does not respond to a liveness test, the client MUST terminate the connection as described above.<a href="#section-9-2.2" class="pilcrow">¶</a>
+</li>
+      </ul>
+<div id="stateless-reset">
+<section id="section-9.1">
+        <h3 id="name-stateless-reset">
+<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-stateless-reset" class="section-name selfRef">Stateless Reset</a>
+        </h3>
+<p id="section-9.1-1">As clients can unilaterally stop the delivery of multicast packets by leaving the relevant (S,G), channels do not need stateless reset tokens.
 Clients therefore do not share the stateless reset tokens of channels with the server. Instead, if an endpoint receives packets addressed to an (S,G) that it can not associate with any existing channel,
-it MAY take the necessary steps to prevent the reception of further such packets, without the need to signal to the server that it should stop sending.<a href="#section-9-1" class="pilcrow">¶</a></p>
-<p id="section-9-2">If a server or client somehow still detect a stateless reset for a channel, they MUST ignore it.<a href="#section-9-2" class="pilcrow">¶</a></p>
+it MAY take the necessary steps to prevent the reception of further such packets, without the need to signal to the server that it should stop sending.<a href="#section-9.1-1" class="pilcrow">¶</a></p>
+<p id="section-9.1-2">If a server or client somehow still detect a stateless reset for a channel, they MUST ignore it.<a href="#section-9.1-2" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="implementation-and-operational-considerations">
