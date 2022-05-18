@@ -721,8 +721,8 @@ Table of Contents
 
 11.4.  MC_CHANNEL_LEAVE
 
-   An MC_CHANNEL_LEAVE frame (type=TBD-03) is sent from server to client
-   in either the unicast connection or a channel.
+   An MC_CHANNEL_LEAVE frame (type=TBD-03) is sent from server to
+   client.
 
    MC_CHANNEL_LEAVE frames are formatted as shown in Figure 5.
 
