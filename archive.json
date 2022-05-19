@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-05-15T00:39:10.686714+00:00",
+  "timestamp": "2022-05-19T00:34:19.586605+00:00",
   "repo": "GrumpyOldTroll/draft-jholland-quic-multicast",
   "labels": [
     {
@@ -375,15 +375,15 @@
       "id": "I_kwDOG6NyZs5ISGVP",
       "title": "Client behavior when unicast connection is disrupted",
       "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/12",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "MaxF12",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "How would a client behave if the unicast connection is interrupted but the Multicast channels still receive data? It wouldn\u2019t be able to check the integrity of any packets, but it isn\u2019t exactly idling either so the idle connection timeout would not trigger I guess? Should this be clarified so that all multicast session are left and the entire connection is shutdown if there is no message over the unicast connection for longer than the idle timeout? ",
       "createdAt": "2022-04-22T19:30:18Z",
-      "updatedAt": "2022-04-25T06:54:36Z",
-      "closedAt": null,
+      "updatedAt": "2022-05-18T23:19:32Z",
+      "closedAt": "2022-05-18T23:19:32Z",
       "comments": [
         {
           "author": "GrumpyOldTroll",
@@ -423,15 +423,15 @@
       "id": "I_kwDOG6NyZs5ISJR6",
       "title": "Max streams ",
       "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/14",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "MaxF12",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "RFC 9000, section 4.6: `Only streams with a stream ID less than \"(max_streams * 4\r\n   + first_stream_id_of_type)\" can be opened`\r\n   \r\nSince each session has its own stream ID space a different restriction might need to be specified to make sure the combination of all streams across all sessions does not exceed the limit set by max_streams.",
       "createdAt": "2022-04-22T19:45:53Z",
-      "updatedAt": "2022-05-04T17:32:29Z",
-      "closedAt": null,
+      "updatedAt": "2022-05-18T23:20:27Z",
+      "closedAt": "2022-05-18T23:20:27Z",
       "comments": [
         {
           "author": "GrumpyOldTroll",
@@ -581,9 +581,9 @@
     {
       "number": 28,
       "id": "I_kwDOG6NyZs5I6Luz",
-      "title": "Add an explanation for STREAM_BOUNDARY",
+      "title": "Remove STREAM_BOUNDARY",
       "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/28",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "GrumpyOldTroll",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -592,24 +592,32 @@
       "labels": [],
       "body": "Good question on what this is and how it's meant to be used from Sam.  Rough answer I sent:\r\n\r\nIt's there because we have shared channels and they might carry streams, and it\u2019s useful to allow the streams to be long-lived.  It\u2019s possible (and I think useful) for a client to start processing an in-progress stream starting at the boundary of an HTTP push for instance, or at a message boundary for another higher-layer protocol, but without this stream boundary the client doesn\u2019t know at what byte offset inside the stream it\u2019s safe to start processing data (if a client started trying to parse the stream in the middle of the HTTP push, it wouldn\u2019t know how to interpret it).\r\n\r\nIn addition to h3 server push (and maybe webtransport?), I think this is useful for the latest moq-related proposals like RUSH (https://datatracker.ietf.org/doc/draft-kpugin-rush/) and WARP (https://datatracker.ietf.org/doc/draft-lcurley-warp/).\r\n",
       "createdAt": "2022-05-02T18:35:39Z",
-      "updatedAt": "2022-05-02T18:35:39Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2022-05-18T22:10:32Z",
+      "closedAt": "2022-05-18T22:10:32Z",
+      "comments": [
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "On reflection, I think we should drop the STREAM_BOUNDARY.  I think it's either that or add a way to abandon old data on a stream prior to a boundary, but I think this is the same a just making a new stream.\r\n\r\nI think it means multicast will consume stream id space an order of magnitude faster than unicast, but that's probably ok, or if it's a problem it can be fixed with a later extension, but probably it's not a problem--stream id space for server-initiated streams would be 2^60-1 I believe, so at 20 streams per second (2 per ABR bit rate, one for the manifest and one for the segment) that would be 1.8 billion years by my calculations, or about 5 months to get to 8-byte stream ids instead of 4-byte stream ids.\r\n\r\nSo I'm changing the title and pulling out STREAM_BOUNDARY instead.\r\n",
+          "createdAt": "2022-05-18T21:57:45Z",
+          "updatedAt": "2022-05-18T21:57:45Z"
+        }
+      ]
     },
     {
       "number": 29,
       "id": "I_kwDOG6NyZs5I69zO",
       "title": "Can the same stream ID be used in multiple channels?",
       "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/29",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "MaxF12",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Since the stream ID space is shared between all channels and the connection, would it be possible for two channels to send data on the same stream? \r\n\r\n4.4 says:\r\n`a server can always avoid stream ID collisions with the stream IDs carried in sessions`\r\nDoes this mean it MUST avoid collisions? \r\n\r\nI guess it depends on where the stream data is processed, if there is a sub process for each channel it might be ok, but if they all end up in the same place you would presumably see different packets with the same ACK number (since each channel uses its own ACK number space, so they have to overlap), which would probably lead to issues.\r\n\r\nIn either case I think it is something that should be clarified. \r\n\r\n",
       "createdAt": "2022-05-02T22:15:35Z",
-      "updatedAt": "2022-05-03T03:11:35Z",
-      "closedAt": null,
+      "updatedAt": "2022-05-18T23:20:01Z",
+      "closedAt": "2022-05-18T23:20:01Z",
       "comments": [
         {
           "author": "GrumpyOldTroll",
@@ -639,15 +647,15 @@
       "id": "I_kwDOG6NyZs5JA_gF",
       "title": "MC_CHANNEL_LEAVE text incomplete",
       "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/32",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "GrumpyOldTroll",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Write something more coherent for the MC_CHANNEL_LEAVE text.",
       "createdAt": "2022-05-04T07:08:10Z",
-      "updatedAt": "2022-05-04T07:08:10Z",
-      "closedAt": null,
+      "updatedAt": "2022-05-18T23:08:19Z",
+      "closedAt": "2022-05-18T23:08:19Z",
       "comments": []
     },
     {
@@ -719,15 +727,15 @@
       "id": "I_kwDOG6NyZs5JETx2",
       "title": "Loss of a MC_CHANNEL_PROPERTIES frame (and potentially MC_CHANNEL_LEAVE)",
       "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/35",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "MaxF12",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "If sent over multicast, a MC_CHANNEL_PROPERTIES frame might get lost. Add text that states that servers MUST retransmit frames lost this way over unicast.\r\n\r\nIf the split into multiple frames happens, this would probably be only a MUST for the key update frames. ",
       "createdAt": "2022-05-04T20:03:08Z",
-      "updatedAt": "2022-05-05T16:20:15Z",
-      "closedAt": null,
+      "updatedAt": "2022-05-18T23:09:18Z",
+      "closedAt": "2022-05-18T23:09:18Z",
       "comments": [
         {
           "author": "GrumpyOldTroll",
@@ -749,6 +757,20 @@
           "body": "Key change means they can no longer decrypt, but yes, same if they miss a hash algorithm change.\r\n\r\nI agree server has to cause a retransmit that client can receive and interpret in a reasonable amount of time, but I think it could for instance be sent on a different multicast channel rather than the unicast channel (and any channel that's broken or left by a client won't work, including the channel that just got updated and client missed it) but I'm not seeing how there's inherently a unicast-specific requirement as opposed to any path that's still working even if the frame in question got lost.\r\n\r\nMaybe it could be right to have a paragraph pointing out that when some updates are missed it makes the channel broken, so server shouldn't use it for retransmitting.",
           "createdAt": "2022-05-05T16:20:15Z",
           "updatedAt": "2022-05-05T16:20:15Z"
+        },
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "I'm not actually sure we need any text for this specifically, as opposed to just actually writing the recovery section (#26), so maybe we should close this one as a dup?",
+          "createdAt": "2022-05-18T22:54:45Z",
+          "updatedAt": "2022-05-18T22:54:45Z"
+        },
+        {
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Sure, makes sense I guess ",
+          "createdAt": "2022-05-18T23:09:18Z",
+          "updatedAt": "2022-05-18T23:09:18Z"
         }
       ]
     },
@@ -757,15 +779,15 @@
       "id": "I_kwDOG6NyZs5JEVYp",
       "title": "Be consistent about saying if frames are sent on channels or connections",
       "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/36",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "MaxF12",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Most frames just state that they are sent \"From server to client\" while e.g. MC_SESSION_LEAVE says \"from server to client\r\nin either the unicast connection or a channel\"\r\n\r\nEither remove the specifier from everywhere or, and probably better, add it to everywhere. ",
       "createdAt": "2022-05-04T20:06:22Z",
-      "updatedAt": "2022-05-05T04:06:53Z",
-      "closedAt": null,
+      "updatedAt": "2022-05-18T23:08:13Z",
+      "closedAt": "2022-05-18T23:08:13Z",
       "comments": [
         {
           "author": "GrumpyOldTroll",
@@ -1647,6 +1669,231 @@
           "body": "LGTM",
           "createdAt": "2022-05-05T04:12:15Z",
           "updatedAt": "2022-05-05T04:12:15Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 38,
+      "id": "PR_kwDOG6NyZs43_M5f",
+      "title": "Add text on connection termination",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/38",
+      "state": "MERGED",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #12 ",
+      "createdAt": "2022-05-17T22:07:07Z",
+      "updatedAt": "2022-05-18T23:19:32Z",
+      "baseRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "baseRefName": "main",
+      "baseRefOid": "00361b7784d8fb0e7deaf711aa2f072bed52d6e9",
+      "headRepository": "MaxF12/draft-jholland-quic-multicast",
+      "headRefName": "issue12",
+      "headRefOid": "d1e9a7d71757a261e627effa7fad822880c081f7",
+      "closedAt": "2022-05-18T23:19:32Z",
+      "mergedAt": "2022-05-18T23:19:32Z",
+      "mergedBy": "GrumpyOldTroll",
+      "mergeCommit": {
+        "oid": "7c37be5e113783351ee07e09d0fdaec721f5bbc9"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOG6NyZs46Mz15",
+          "commit": {
+            "abbreviatedOid": "2ce2cb8"
+          },
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "Yes, this makes sense and should be stated, thanks.  I flagged a nit and encourage fixing it but otherwise lgtm.",
+          "createdAt": "2022-05-18T06:51:35Z",
+          "updatedAt": "2022-05-18T06:52:40Z",
+          "comments": [
+            {
+              "originalPosition": 11,
+              "body": "nit: We should probably use the same \"liveness\" wording from [RFC 9000 10.1](https://www.rfc-editor.org/rfc/rfc9000#name-liveness-testing) instead of \"lively\" and \"liveliness check\".",
+              "createdAt": "2022-05-18T06:51:35Z",
+              "updatedAt": "2022-05-18T06:52:40Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 39,
+      "id": "PR_kwDOG6NyZs44Dqao",
+      "title": "removed MC_CHANNEL_STREAM_BOUNDARY_OFFSET",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/39",
+      "state": "MERGED",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2022-05-18T21:59:33Z",
+      "updatedAt": "2022-05-18T22:07:19Z",
+      "baseRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "baseRefName": "main",
+      "baseRefOid": "00361b7784d8fb0e7deaf711aa2f072bed52d6e9",
+      "headRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "headRefName": "issue-28",
+      "headRefOid": "9d9bfc7be121010730cc972981b37b96b848d183",
+      "closedAt": "2022-05-18T22:07:19Z",
+      "mergedAt": "2022-05-18T22:07:19Z",
+      "mergedBy": "MaxF12",
+      "mergeCommit": {
+        "oid": "ba940a6c6f0a4a3ce8fc2787eeffbd109fbaac1e"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOG6NyZs46Ro5H",
+          "commit": {
+            "abbreviatedOid": "9d9bfc7"
+          },
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "LGTM",
+          "createdAt": "2022-05-18T22:07:14Z",
+          "updatedAt": "2022-05-18T22:07:14Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 40,
+      "id": "PR_kwDOG6NyZs44D2xe",
+      "title": "fix max_streams and streams_blocked explanation",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/40",
+      "state": "MERGED",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2022-05-18T22:33:58Z",
+      "updatedAt": "2022-05-18T23:18:57Z",
+      "baseRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "baseRefName": "main",
+      "baseRefOid": "ba940a6c6f0a4a3ce8fc2787eeffbd109fbaac1e",
+      "headRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "headRefName": "issue-29",
+      "headRefOid": "24bff1f05c44e0acba93786d082231c377c893d1",
+      "closedAt": "2022-05-18T23:18:52Z",
+      "mergedAt": "2022-05-18T23:18:51Z",
+      "mergedBy": "GrumpyOldTroll",
+      "mergeCommit": {
+        "oid": "ef2627ccde25974c689d0f87b0445736f450fdf7"
+      },
+      "comments": [
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "fix for #29 ",
+          "createdAt": "2022-05-18T22:34:17Z",
+          "updatedAt": "2022-05-18T22:34:17Z"
+        },
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "also for #14 ",
+          "createdAt": "2022-05-18T22:36:09Z",
+          "updatedAt": "2022-05-18T22:36:09Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOG6NyZs46Rw-D",
+          "commit": {
+            "abbreviatedOid": "5090ac2"
+          },
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "LGTM, thanks this clearly things up a lot I think. One minor comment. ",
+          "createdAt": "2022-05-18T23:01:21Z",
+          "updatedAt": "2022-05-18T23:01:58Z",
+          "comments": [
+            {
+              "originalPosition": 11,
+              "body": "Wouldn\u2018t it be enough to just have the client react to the streams exceeding the limit? I think having the server also send a LEAVE frame might not always be perfect, especially in cases where the client just can increase its stream limit. Also, LEAVE frames don\u2019t contain a reason for leaving, which means the client wouldn\u2019t necessarily know why it has to leave the channel. So far it\u2019s mostly clients leaving channels and stating the reason (e.g. rate exceeded).\r\n\r\n\r\nAlso, CHANNEL_STATE Frames Are missing the new reason now I think.",
+              "createdAt": "2022-05-18T23:01:21Z",
+              "updatedAt": "2022-05-18T23:01:58Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOG6NyZs46Rye0",
+          "commit": {
+            "abbreviatedOid": "5090ac2"
+          },
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-18T23:12:11Z",
+          "updatedAt": "2022-05-18T23:12:11Z",
+          "comments": [
+            {
+              "originalPosition": 11,
+              "body": "That can be a SHOULD instead of a MUST.  I feel like the server should be proactively responsible here if client is not moving its MAX_STREAMS, but it doesn't have to be a hard limit, especially since the server can be out of sync with the channel sender by a bit anyway.\r\n\r\nHmm, I thought I added the reason, but maybe it's in a different branch.  I may have confused myself...",
+              "createdAt": "2022-05-18T23:12:11Z",
+              "updatedAt": "2022-05-18T23:12:11Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 41,
+      "id": "PR_kwDOG6NyZs44D9m-",
+      "title": "Fixed up text for MC_CHANNEL_LEAVE and state-changing.",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/41",
+      "state": "MERGED",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "fix for #32 ",
+      "createdAt": "2022-05-18T22:52:16Z",
+      "updatedAt": "2022-05-18T23:08:01Z",
+      "baseRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "baseRefName": "main",
+      "baseRefOid": "ba940a6c6f0a4a3ce8fc2787eeffbd109fbaac1e",
+      "headRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "headRefName": "issue-32",
+      "headRefOid": "3c08266ff51a66ce00d3e2eb778afa4dfdcb2c7a",
+      "closedAt": "2022-05-18T23:08:01Z",
+      "mergedAt": "2022-05-18T23:08:01Z",
+      "mergedBy": "MaxF12",
+      "mergeCommit": {
+        "oid": "d7569327d42ecbf9f12013760a8aa85f55a3d72c"
+      },
+      "comments": [
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "also fixes #36 now",
+          "createdAt": "2022-05-18T22:58:35Z",
+          "updatedAt": "2022-05-18T22:58:35Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOG6NyZs46Rx43",
+          "commit": {
+            "abbreviatedOid": "3c08266"
+          },
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "LGTM",
+          "createdAt": "2022-05-18T23:07:53Z",
+          "updatedAt": "2022-05-18T23:07:53Z",
           "comments": []
         }
       ]
