@@ -1517,6 +1517,8 @@ MC_CHANNEL_ANNOUNCE Frame {
   Header AEAD Algorithm (16),
   Header Key Length (i),
   Header Key (..),
+  AEAD Algorithm (16),
+  Integrity Hash Algorithm (16)
 }
 </pre>
 </div>
@@ -1551,6 +1553,26 @@ MC_CHANNEL_ANNOUNCE Frame {
 </li>
             </ul>
 </li>
+          <li class="normal" id="section-11.1-6.10">AEAD Algorithm: A value from <a href="https://www.iana.org/assignments/aead-parameters/aead-parameters.xhtml">https://www.iana.org/assignments/aead-parameters/aead-parameters.xhtml</a>.  The value MUST match a value provided in the "AEAD Algorithms List" of the transport parameter (see <a href="#transport-parameter" class="xref">Section 3</a>).<a href="#section-11.1-6.10" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-11.1-6.11">
+            <p id="section-11.1-6.11.1">Integrity Hash Algorithm: The hash algorithm used in integrity frames.<a href="#section-11.1-6.11.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-11.1-6.11.2.1">
+                <p id="section-11.1-6.11.2.1.1"><strong>Author's Note:</strong> Several candidate iana registries, not sure which one to use?  Some have only text for some possibly useful values.  For now we use the first of these:<a href="#section-11.1-6.11.2.1.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-11.1-6.11.2.1.2.1">
+                    <a href="https://www.iana.org/assignments/named-information/named-information.xhtml#hash-alg">https://www.iana.org/assignments/named-information/named-information.xhtml#hash-alg</a><a href="#section-11.1-6.11.2.1.2.1" class="pilcrow">¶</a>
+</li>
+                  <li class="normal" id="section-11.1-6.11.2.1.2.2">
+                    <a href="https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-18">https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-18</a><a href="#section-11.1-6.11.2.1.2.2" class="pilcrow">¶</a>
+</li>
+                  <li class="normal" id="section-11.1-6.11.2.1.2.3">(text-only): <a href="https://www.iana.org/assignments/hash-function-text-names/hash-function-text-names.xhtml">https://www.iana.org/assignments/hash-function-text-names/hash-function-text-names.xhtml</a><a href="#section-11.1-6.11.2.1.2.3" class="pilcrow">¶</a>
+</li>
+                </ul>
+</li>
+            </ul>
+</li>
         </ul>
 <p id="section-11.1-7">A client MUST NOT use the channel ID included in the MC_CHANNEL_ANNOUNCE frame as a connection ID for the unicast connection. If it is already in use, the client should retire it as soon as possible.
 As the server knows which connection IDs are in use by the client, it MUST wait with the sending of a MC_CHANNEL_JOIN frame until the channel ID associated with it has been retired by the client.<a href="#section-11.1-7" class="pilcrow">¶</a></p>
@@ -1579,13 +1601,11 @@ MC_CHANNEL_PROPERTIES Frame {
   Properties Sequence Number (i),
   From Packet Number (i),
   Until Packet Number (i),
-  AEAD Algorithm (16),
   Key Length (i),
   Key (..),
-  Integrity Hash Algorithm (16),
   Max Rate (i),
   Max Idle Time (i),
-  ACK Bundle Size (i),
+  ACK Bundle Size (i)
 }
 </pre>
 </div>
@@ -1601,38 +1621,18 @@ MC_CHANNEL_PROPERTIES Frame {
 </li>
           <li class="normal" id="section-11.2-7.3">Properties Sequence Number: Increases by 1 each time the properties for the channel are changed by the server.  The client tracks the sequence number of the MC_CHANNEL_PROPERTIES frame that set its current value, and only updates the value and the packet number range on which it's applicable if the Properties Sequence Number is higher.<a href="#section-11.2-7.3" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-11.2-7.4">From Packet Number, Until Packet Number: The values in this MC_CHANNEL_PROPERTIES frame apply only to packets starting at From Packet Number and continuing for all packets up to and including Until Packet Number.  If Until Packet Number is omitted it indicates the current property values for this channel have no expiration at (equivalent to the maximum value for packet numbers, or 2^62-1).  If a packet number is received outside of any prior (From,Until) range, it has no applicable channel properties and MUST be dropped.<a href="#section-11.2-7.4" class="pilcrow">¶</a>
+          <li class="normal" id="section-11.2-7.4">From Packet Number, Until Packet Number: The values in this MC_CHANNEL_PROPERTIES frame apply only to packets starting at From Packet Number and continuing for all packets up to and including Until Packet Number.  If Until Packet Number is zero it indicates the current property values for this channel have no expiration (equivalent to the maximum value for packet numbers, or 2^62-1).  If a packet number is received outside of any previously received [From,Until] range, it has no applicable channel properties and MUST be dropped.<a href="#section-11.2-7.4" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-11.2-7.5">AEAD Algorithm: A value from <a href="https://www.iana.org/assignments/aead-parameters/aead-parameters.xhtml">https://www.iana.org/assignments/aead-parameters/aead-parameters.xhtml</a>.  The value MUST match a value provided in the "AEAD Algorithms List" of the transport parameter (see <a href="#transport-parameter" class="xref">Section 3</a>).<a href="#section-11.2-7.5" class="pilcrow">¶</a>
+          <li class="normal" id="section-11.2-7.5">Key Length: Provides the length of the Key field.  It MUST match a valid key length for the AEAD Algorithm from the MC_CHANNEL_ANNOUNCE frame for this channel.<a href="#section-11.2-7.5" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-11.2-7.6">Key Length: Provides the length of the Key field.  It MUST match a valid key length for the AEAD Algorithm.<a href="#section-11.2-7.6" class="pilcrow">¶</a>
+          <li class="normal" id="section-11.2-7.6">Key: Used to protect the packet contents of 1-RTT packets for the channel as described in <span>[<a href="#RFC9001" class="xref">RFC9001</a>]</span>, with length given by Key Length.
+To maintain forward secrecy and prevent malicious clients from decrypting packets long after they have left or were removed from the unicast connection, servers SHOULD periodically send key updates using only unicast.<a href="#section-11.2-7.6" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-11.2-7.7">Key: Used to protect the packet contents of 1-RTT packets for the channel as described in <span>[<a href="#RFC9001" class="xref">RFC9001</a>]</span>, with length given by Key Length.
-To maintain forward secrecy and prevent malicious clients from decrypting packets long after they have left or were removed from the unicast connection, servers SHOULD periodically send key updates using only unicast.<a href="#section-11.2-7.7" class="pilcrow">¶</a>
+          <li class="normal" id="section-11.2-7.7">Max Rate: The maximum rate in Kibps of the payload data for this channel.Channel data MUST NOT exceed this rate over any 5s window, if it does clients SHOULD leave the channel with reason Max Rate Exceeded.<a href="#section-11.2-7.7" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-11.2-7.8">
-            <p id="section-11.2-7.8.1">Integrity Hash Algorithm: The hash algorithm used in integrity frames.<a href="#section-11.2-7.8.1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-11.2-7.8.2.1">
-                <p id="section-11.2-7.8.2.1.1"><strong>Author's Note:</strong> Several candidate iana registries, not sure which one to use?  Some have only text for some possibly useful values.  For now we use the first of these:<a href="#section-11.2-7.8.2.1.1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-11.2-7.8.2.1.2.1">
-                    <a href="https://www.iana.org/assignments/named-information/named-information.xhtml#hash-alg">https://www.iana.org/assignments/named-information/named-information.xhtml#hash-alg</a><a href="#section-11.2-7.8.2.1.2.1" class="pilcrow">¶</a>
+          <li class="normal" id="section-11.2-7.8">Max Idle Time: The maximum expected idle time of the channel.  If this amount of time passes in a joined channel without data received, clients SHOULD leave the channel with reason Max Idle Time Exceeded.<a href="#section-11.2-7.8" class="pilcrow">¶</a>
 </li>
-                  <li class="normal" id="section-11.2-7.8.2.1.2.2">
-                    <a href="https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-18">https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-18</a><a href="#section-11.2-7.8.2.1.2.2" class="pilcrow">¶</a>
-</li>
-                  <li class="normal" id="section-11.2-7.8.2.1.2.3">(text-only): <a href="https://www.iana.org/assignments/hash-function-text-names/hash-function-text-names.xhtml">https://www.iana.org/assignments/hash-function-text-names/hash-function-text-names.xhtml</a><a href="#section-11.2-7.8.2.1.2.3" class="pilcrow">¶</a>
-</li>
-                </ul>
-</li>
-            </ul>
-</li>
-          <li class="normal" id="section-11.2-7.9">Max Rate: The maximum rate in Kibps of the payload data for this channel.Channel data MUST NOT exceed this rate over any 5s window, if it does clients SHOULD leave the channel with reason Max Rate Exceeded.<a href="#section-11.2-7.9" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-11.2-7.10">Max Idle Time: The maximum expected idle time of the channel.  If this amount of time passes in a joined channel without data received, clients SHOULD leave the channel with reason Max Idle Time Exceeded.<a href="#section-11.2-7.10" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-11.2-7.11">ACK Bundle Size:nThe minimum number of ACKs a client should send in a single QUIC packet. If the max_ack_delay would force a client to send a packet that only consists of MC_CHANNEL_ACK frames, it SHOULD instead wait with sending until at least the specified number of acknowledgements have been collected. However, the Client MUST send any pending acknowledgements at least once per Max Idle Time to prevent the Server from perceiving the channel as interrupted.<a href="#section-11.2-7.11" class="pilcrow">¶</a>
+          <li class="normal" id="section-11.2-7.9">ACK Bundle Size:nThe minimum number of ACKs a client should send in a single QUIC packet. If the max_ack_delay would force a client to send a packet that only consists of MC_CHANNEL_ACK frames, it SHOULD instead wait with sending until at least the specified number of acknowledgements have been collected. However, the Client MUST send any pending acknowledgements at least once per Max Idle Time to prevent the Server from perceiving the channel as interrupted.<a href="#section-11.2-7.9" class="pilcrow">¶</a>
 </li>
         </ul>
 <p id="section-11.2-8">From Packet Number and Until Packet Number are used to indicate the packet number (Section 17.1 of <span>[<a href="#RFC9000" class="xref">RFC9000</a>]</span>) the 1-RTT packets received) over which these values are applicable.<a href="#section-11.2-8" class="pilcrow">¶</a></p>

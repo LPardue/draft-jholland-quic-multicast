@@ -493,6 +493,8 @@ Table of Contents
      Header AEAD Algorithm (16),
      Header Key Length (i),
      Header Key (..),
+     AEAD Algorithm (16),
+     Integrity Hash Algorithm (16)
    }
 
                  Figure 2: MC_CHANNEL_ANNOUNCE Frame Format
@@ -544,6 +546,34 @@ Table of Contents
          (https://www.iana.org/assignments/tls-parameters/tls-
          parameters.xhtml#tls-parameters-4))
 
+   *  AEAD Algorithm: A value from https://www.iana.org/assignments/
+      aead-parameters/aead-parameters.xhtml
+      (https://www.iana.org/assignments/aead-parameters/aead-
+      parameters.xhtml).  The value MUST match a value provided in the
+      "AEAD Algorithms List" of the transport parameter (see Section 3).
+
+   *  Integrity Hash Algorithm: The hash algorithm used in integrity
+      frames.
+
+      -  *Author's Note:* Several candidate iana registries, not sure
+         which one to use?  Some have only text for some possibly useful
+         values.  For now we use the first of these:
+
+         o  https://www.iana.org/assignments/named-information/named-
+            information.xhtml#hash-alg
+            (https://www.iana.org/assignments/named-information/named-
+            information.xhtml#hash-alg)
+
+         o  https://www.iana.org/assignments/tls-parameters/tls-
+            parameters.xhtml#tls-parameters-18
+            (https://www.iana.org/assignments/tls-parameters/tls-
+            parameters.xhtml#tls-parameters-18)
+
+         o  (text-only): https://www.iana.org/assignments/hash-function-
+            text-names/hash-function-text-names.xhtml
+            (https://www.iana.org/assignments/hash-function-text-names/
+            hash-function-text-names.xhtml)
+
    A client MUST NOT use the channel ID included in the
    MC_CHANNEL_ANNOUNCE frame as a connection ID for the unicast
    connection.  If it is already in use, the client should retire it as
@@ -585,13 +615,11 @@ Table of Contents
      Properties Sequence Number (i),
      From Packet Number (i),
      Until Packet Number (i),
-     AEAD Algorithm (16),
      Key Length (i),
      Key (..),
-     Integrity Hash Algorithm (16),
      Max Rate (i),
      Max Idle Time (i),
-     ACK Bundle Size (i),
+     ACK Bundle Size (i)
    }
 
                 Figure 3: MC_CHANNEL_PROPERTIES Frame Format
@@ -613,21 +641,16 @@ Table of Contents
    *  From Packet Number, Until Packet Number: The values in this
       MC_CHANNEL_PROPERTIES frame apply only to packets starting at From
       Packet Number and continuing for all packets up to and including
-      Until Packet Number.  If Until Packet Number is omitted it
-      indicates the current property values for this channel have no
-      expiration at (equivalent to the maximum value for packet numbers,
-      or 2^62-1).  If a packet number is received outside of any prior
-      (From,Until) range, it has no applicable channel properties and
+      Until Packet Number.  If Until Packet Number is zero it indicates
+      the current property values for this channel have no expiration
+      (equivalent to the maximum value for packet numbers, or 2^62-1).
+      If a packet number is received outside of any previously received
+      [From,Until] range, it has no applicable channel properties and
       MUST be dropped.
 
-   *  AEAD Algorithm: A value from https://www.iana.org/assignments/
-      aead-parameters/aead-parameters.xhtml
-      (https://www.iana.org/assignments/aead-parameters/aead-
-      parameters.xhtml).  The value MUST match a value provided in the
-      "AEAD Algorithms List" of the transport parameter (see Section 3).
-
    *  Key Length: Provides the length of the Key field.  It MUST match a
-      valid key length for the AEAD Algorithm.
+      valid key length for the AEAD Algorithm from the
+      MC_CHANNEL_ANNOUNCE frame for this channel.
 
    *  Key: Used to protect the packet contents of 1-RTT packets for the
       channel as described in [RFC9001], with length given by Key
@@ -635,28 +658,6 @@ Table of Contents
       from decrypting packets long after they have left or were removed
       from the unicast connection, servers SHOULD periodically send key
       updates using only unicast.
-
-   *  Integrity Hash Algorithm: The hash algorithm used in integrity
-      frames.
-
-      -  *Author's Note:* Several candidate iana registries, not sure
-         which one to use?  Some have only text for some possibly useful
-         values.  For now we use the first of these:
-
-         o  https://www.iana.org/assignments/named-information/named-
-            information.xhtml#hash-alg
-            (https://www.iana.org/assignments/named-information/named-
-            information.xhtml#hash-alg)
-
-         o  https://www.iana.org/assignments/tls-parameters/tls-
-            parameters.xhtml#tls-parameters-18
-            (https://www.iana.org/assignments/tls-parameters/tls-
-            parameters.xhtml#tls-parameters-18)
-
-         o  (text-only): https://www.iana.org/assignments/hash-function-
-            text-names/hash-function-text-names.xhtml
-            (https://www.iana.org/assignments/hash-function-text-names/
-            hash-function-text-names.xhtml)
 
    *  Max Rate: The maximum rate in Kibps of the payload data for this
       channel.Channel data MUST NOT exceed this rate over any 5s window,
