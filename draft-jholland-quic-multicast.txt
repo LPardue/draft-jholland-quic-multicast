@@ -5,10 +5,10 @@
 QUIC Working Group                                            J. Holland
 Internet-Draft                                 Akamai Technologies, Inc.
 Intended status: Experimental                                  L. Pardue
-Expires: 19 November 2022                                               
+Expires: 22 November 2022                                               
                                                                M. Franke
                                                                TU Berlin
-                                                             18 May 2022
+                                                             21 May 2022
 
 
                       Multicast Extension for QUIC
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 19 November 2022.
+   This Internet-Draft will expire on 22 November 2022.
 
 Copyright Notice
 
@@ -806,17 +806,22 @@ Table of Contents
 
 11.6.  MC_CHANNEL_ACK
 
-   Client->Server on unicast connection.
+   The MC_CHANNEL_ACK frame (types TBD-06 and TBD-07; experiments use
+   0xff3e806..0xff3e807) is an extension of the ACK frame defined by
+   [RFC9000].  It is used to acknowledge packets that were sent on
+   multicast channels.  If the frame type is TBD-07, MC_CHANNEL_ACK
+   frames also contain the sum of QUIC packets with associated ECN marks
+   received on the connection up to this point.
 
    (TODO: Is it possible to reuse the multiple packet number space
    version of ACK_MP from Section 12.2 of
    [I-D.draft-ietf-quic-multipath], defining channel id as the packet
-   number space?  at 2022-04-12 they're identical.)
+   number space?  at 2022-05 they're identical.)
 
    MC_CHANNEL_ACK frames are formatted as shown in Figure 7.
 
    MC_CHANNEL_ACK Frame {
-     Type (i) = TBD-07 (experiments use 0xff3e807),
+     Type (i) = TBD-06..TBD-07 (experiments use 0xff3e806, 0xff3e807),
      ID Length (8),
      Channel ID (8..160),
      Largest Acknowledged (i),
