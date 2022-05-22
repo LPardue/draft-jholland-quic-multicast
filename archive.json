@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-05-19T00:34:19.586605+00:00",
+  "timestamp": "2022-05-22T00:28:53.217277+00:00",
   "repo": "GrumpyOldTroll/draft-jholland-quic-multicast",
   "labels": [
     {
@@ -670,7 +670,7 @@
       "labels": [],
       "body": "The initial time to join a channel can be significantly longer than the value in max idle time (as that is intended as the time to detect a disruption of an already established channel) as the join has to be propagated and the multicast tree constructed. \r\n\r\nThere could probably be an additional field in MC_CHANNEL_PROPERTIES (something like max establishment time) or just general guidance and a recommendation on the time it might take. ",
       "createdAt": "2022-05-04T12:45:17Z",
-      "updatedAt": "2022-05-04T16:12:56Z",
+      "updatedAt": "2022-05-21T22:57:00Z",
       "closedAt": null,
       "comments": [
         {
@@ -797,6 +797,233 @@
           "updatedAt": "2022-05-05T04:06:53Z"
         }
       ]
+    },
+    {
+      "number": 42,
+      "id": "I_kwDOG6NyZs5KB4wm",
+      "title": "move aead algorithm to CHANNEL_ANNOUNCE",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/42",
+      "state": "OPEN",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Suggested change from @squarooticus :\r\n\r\nAnnounce the payload AEAD algorithm in CHANNEL_ANNOUNCE and just assume it isn't going to change for the lifetime of the channel. This probably works better with existing QUIC stacks that assume only the key, rather than the alg, will change during a connection.",
+      "createdAt": "2022-05-19T16:09:52Z",
+      "updatedAt": "2022-05-19T17:01:47Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Would maybe also make sense for the hash algorithm? ",
+          "createdAt": "2022-05-19T16:53:11Z",
+          "updatedAt": "2022-05-19T16:53:11Z"
+        },
+        {
+          "author": "squarooticus",
+          "authorAssociation": "NONE",
+          "body": "Yes, I definitely mean both.",
+          "createdAt": "2022-05-19T17:01:47Z",
+          "updatedAt": "2022-05-19T17:01:47Z"
+        }
+      ]
+    },
+    {
+      "number": 43,
+      "id": "I_kwDOG6NyZs5KB8Og",
+      "title": "Michaels review - Give more details about the unicast connection ",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/43",
+      "state": "OPEN",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "> I have a feeling that more should be said about this unicast connection. Some constraints perhaps\u2026 can it migrate? Can it use multiple streams? Can it be used for traffic that\u2019s not bound to the signaling for the multicast stuff here?\r\n> \r\n> Also: here, and in most places, you call it \u201cthe unicast connection\u201d, which makes quite clear that there is one only. That\u2019s good!  But in some places, it says \u201ca unicast connection\u201d which then confuses me. There IS only one which is associated with this multicast stuff, right?\r\n\r\n",
+      "createdAt": "2022-05-19T16:22:47Z",
+      "updatedAt": "2022-05-19T17:42:03Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "There is only one, yes.  I agree, \"a unicast connection\" should be changed to \"the unicast connection\".\r\n\r\nI think there are no restrictions on the unicast connection.  It can migrate, it can use multiple streams, it can be used for traffic not bound to the signaling for the multicast stuff.  It can be multipath.\r\n\r\nThe only restriction I know that seems like it has been confusing is the restriction on streams: any byte of data at any offset of a particular stream must be the same no matter where the frame containing that byte of stream data came from.  \r\n\r\nThis might place some operational restrictions on servers that use the same channels, to make sure they individually don't generate any unicast streams that could conflict.  (I think they have several mechanisms they can use to ensure that doesn't happen, but I think it's implementation-specific.)",
+          "createdAt": "2022-05-19T17:42:03Z",
+          "updatedAt": "2022-05-19T17:42:03Z"
+        }
+      ]
+    },
+    {
+      "number": 44,
+      "id": "I_kwDOG6NyZs5KB8_2",
+      "title": "Michaels review - Add text for graceful degradation",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/44",
+      "state": "OPEN",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Regarding graceful degradation to unicast: \r\n> I\u2019d expect this spec to tell me how... but maybe in a future version.",
+      "createdAt": "2022-05-19T16:25:47Z",
+      "updatedAt": "2022-05-19T16:25:47Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 45,
+      "id": "I_kwDOG6NyZs5KB_3o",
+      "title": "Michaels review - Rephrase part of section 11.2",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/45",
+      "state": "OPEN",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Regarding this part:\r\n\r\n> From Packet Number and Until Packet Number are used to indicate the packet number (Section 17.1 of [[RFC9000](https://www.ietf.org/archive/id/draft-jholland-quic-multicast-00.html#RFC9000)]) of the 1-RTT packets received over which these values are applicable.\r\n\r\nHis comment is:\r\n\r\n> This is hard to understand, and I think it\u2019s to do with \u201cthese values\u201d. Replace with \u201cthe fields of the MC_CHANNEL_PROPERTIES frame\u201d, perhaps??",
+      "createdAt": "2022-05-19T16:36:55Z",
+      "updatedAt": "2022-05-19T16:36:55Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 46,
+      "id": "I_kwDOG6NyZs5KCAHF",
+      "title": "Michaels review - \"unspecified termination\"",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/46",
+      "state": "OPEN",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Regarding this part:\r\n\r\n> A From Packet Number without an Until Packet Number has an unspecified termination.\r\n\r\nHis comment is:\r\n\r\n> A From Packet Number without an Until Packet Number has an unspecified termination.",
+      "createdAt": "2022-05-19T16:37:44Z",
+      "updatedAt": "2022-05-19T16:37:44Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 48,
+      "id": "I_kwDOG6NyZs5KDCX7",
+      "title": "MC_CHANNEL_INTEGRITY frames MUST be protected against injection, modification, and repla",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/48",
+      "state": "OPEN",
+      "author": "squarooticus",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "\"Integrity\" as defined in draft-krose-multicast-security is specific to multicast (and necessarily weaker than for unicast). So I think the use of \"integrity\" in normative language here is probably ambiguous. The key properties are protection against:\r\n\r\n* Injection: an attacker, including other receivers, must not be able to create new channel integrity frames that will be accepted by a properly-functioning receiver. \r\n* Modification: an attacker, including other receivers, must not be able to modify channel integrity frames such that they will be accepted by a properly-functioning receiver.\r\n* Replay: an attacker, including other receivers, must not be able to alter the content delivered to a receiver through the replay of previously-seen channel integrity frames.\r\n\r\nRight now, all three properties are achieved by sending (and presumably accepting) such frames only over unicast QUIC. In the future, the first two properties will be provided by something like AMBI-over-unicast-or-signed-manifest or ALTA, while the third is (now and in the future) provided by the fact that channel integrity frames are stateless and declarative (i.e., a given frame has an immutable meaning).",
+      "createdAt": "2022-05-19T20:47:11Z",
+      "updatedAt": "2022-05-20T15:34:05Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "squarooticus",
+          "authorAssociation": "NONE",
+          "body": "I should emphasize that until we have out-of-band integrity, any channel integrity packets received over multicast MUST be dropped. We could track the provenance of QUIC packets throughout the stack, or drop such privileged frames before they are injected into whatever packet queue exists in the code (if any; I don't know quite how that works yet). But I do find the way it is designed elegant in the sense that adding OOB integrity protection requires no changes to the QUIC frames as-defined here, only to how they are authenticated and interpreted.",
+          "createdAt": "2022-05-19T20:53:26Z",
+          "updatedAt": "2022-05-19T20:54:52Z"
+        },
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "I don't follow. The current intent is that if an integrity frame is received in a packet delivered with a multicast channel, it is accepted only if the packet containing the frame has a hash in another integrity frame that was accepted.  So they can be accepted over either unicast or multicast.\r\n\r\nAs a practical matter, I agree there has to be be a unicast anchor, but a packet with its integrity guaranteed by a prior integrity frame can contain more integrity frames, and this provides transitive integrity much like a Merkle tree, doesn't it?",
+          "createdAt": "2022-05-20T05:50:03Z",
+          "updatedAt": "2022-05-20T05:50:03Z"
+        },
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "That said, +1 to making a solid definition of the properties that are provided by the integrity frames, that's a great insight.  But I think the properties provided are for QUIC packets delivered over multicast channels.  This provides (I think?) the same 3 properties for whatever frames are carried within those packets, right?",
+          "createdAt": "2022-05-20T05:55:21Z",
+          "updatedAt": "2022-05-20T05:55:21Z"
+        },
+        {
+          "author": "squarooticus",
+          "authorAssociation": "NONE",
+          "body": "> I don't follow. The current intent is that if an integrity frame is received in a packet delivered with a multicast channel, it is accepted only if the packet containing the frame has a hash in another integrity frame that was accepted. So they can be accepted over either unicast or multicast.\r\n\r\nWell, it's more complicated, right? It's either a hash in another accepted integrity frame, or it's delivered over unicast (which has QUIC-native integrity guarantees). It's the principle that every integrity frame must be cryptographically linked to an established root of trust.",
+          "createdAt": "2022-05-20T15:32:24Z",
+          "updatedAt": "2022-05-20T15:32:24Z"
+        },
+        {
+          "author": "squarooticus",
+          "authorAssociation": "NONE",
+          "body": "So, scratch my objection to multicast-delivered integrity frames. Instead: ideally, the draft would specify a necessary and sufficient set of conditions for an integrity frame to be accepted that will not require updating when AMBI or ALTA are introduced.",
+          "createdAt": "2022-05-20T15:34:05Z",
+          "updatedAt": "2022-05-20T15:34:05Z"
+        }
+      ]
+    },
+    {
+      "number": 50,
+      "id": "I_kwDOG6NyZs5KIoqq",
+      "title": "Add channel state diagrams",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/50",
+      "state": "OPEN",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "We at least need a channel state diagram for client, and probably also for server.\r\n(like https://www.rfc-editor.org/rfc/rfc9000#fig-stream-send-states and https://www.rfc-editor.org/rfc/rfc9000#fig-stream-recv-states and https://www.ietf.org/archive/id/draft-ietf-quic-multipath-01.html#fig-path-states)",
+      "createdAt": "2022-05-20T23:17:18Z",
+      "updatedAt": "2022-05-21T21:37:54Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Agreed, I was thinking about states when I made the object as well. So far I have 4 (Idle, joining, joined and timed out). Do you think we need more?",
+          "createdAt": "2022-05-21T21:37:54Z",
+          "updatedAt": "2022-05-21T21:37:54Z"
+        }
+      ]
+    },
+    {
+      "number": 51,
+      "id": "I_kwDOG6NyZs5KIqL_",
+      "title": "Add flow diagrams",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/51",
+      "state": "OPEN",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Flow diagrams like these should show the important parts for channel use examples and who they're sent by:\r\n- https://www.rfc-editor.org/rfc/rfc9000#fig-auth-cid\r\n- https://www.rfc-editor.org/rfc/rfc9000#figure-5\r\n",
+      "createdAt": "2022-05-20T23:23:42Z",
+      "updatedAt": "2022-05-20T23:23:42Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 52,
+      "id": "I_kwDOG6NyZs5KI8BC",
+      "title": "Encrypt-then-mac is recommended",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/52",
+      "state": "OPEN",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "From @squarooticus:\r\n\u00a7 7.1 is going to trigger some folks who have ETM (encrypt-then-mac) on the brain to avoid leaking information, so some reassurance that the packet hashes are in the encrypted stream would probably suffice to prevent this reaction.\r\n\r\nResponse from Jake:\r\n\r\nI guess the flow here if the hash is on the encrypted packet is:\r\n 1. hash the packet with the channel's hash algorithm\r\n 2. decrypt the packet (or at least the header) so you have the packet number\r\n 3. check the hash, reject if it doesn't match\r\n 4. parse the packet and accept it (provided it doesn't trigger protocol errors, etc.)\r\n \r\nWould that work better?",
+      "createdAt": "2022-05-21T03:47:52Z",
+      "updatedAt": "2022-05-21T03:48:23Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 53,
+      "id": "I_kwDOG6NyZs5KI88V",
+      "title": "MC_CHANNEL_ACK needs ECN/non-ECN versions, like other acks",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/53",
+      "state": "OPEN",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2022-05-21T04:06:36Z",
+      "updatedAt": "2022-05-21T04:06:36Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
@@ -1897,6 +2124,137 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 47,
+      "id": "PR_kwDOG6NyZs44Impv",
+      "title": "Michaels editorial comments",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/47",
+      "state": "OPEN",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2022-05-19T16:44:25Z",
+      "updatedAt": "2022-05-21T04:18:45Z",
+      "baseRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "baseRefName": "main",
+      "baseRefOid": "7c37be5e113783351ee07e09d0fdaec721f5bbc9",
+      "headRepository": "MaxF12/draft-jholland-quic-multicast",
+      "headRefName": "mwelzl-comments",
+      "headRefOid": "5b14aa30a227e8174aebccc4e610da956b81c69c",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOG6NyZs46dZIo",
+          "commit": {
+            "abbreviatedOid": "5b14aa3"
+          },
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "Thanks for pulling these in, a few nits I noticed in the changes, but then go ahead and merge I think.",
+          "createdAt": "2022-05-21T04:15:11Z",
+          "updatedAt": "2022-05-21T04:18:45Z",
+          "comments": [
+            {
+              "originalPosition": 80,
+              "body": "This is a wrong edit.  \"its\" could be changed to \"the channel's\" if its meaning is unclear, but this was a possessive pronoun, not a conjunction of \"it is\".",
+              "createdAt": "2022-05-21T04:15:11Z",
+              "updatedAt": "2022-05-21T04:18:45Z"
+            },
+            {
+              "originalPosition": 110,
+              "body": "This should also be \"the unicast connection\" instead of \"a unicast connection\", right?",
+              "createdAt": "2022-05-21T04:17:15Z",
+              "updatedAt": "2022-05-21T04:18:45Z"
+            },
+            {
+              "originalPosition": 128,
+              "body": "close paren is missing",
+              "createdAt": "2022-05-21T04:17:45Z",
+              "updatedAt": "2022-05-21T04:18:45Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 54,
+      "id": "PR_kwDOG6NyZs44OlxX",
+      "title": "fixes for MC_CHANNEL_ACK frame",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/54",
+      "state": "MERGED",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2022-05-21T04:21:46Z",
+      "updatedAt": "2022-05-21T21:42:40Z",
+      "baseRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "baseRefName": "main",
+      "baseRefOid": "7c37be5e113783351ee07e09d0fdaec721f5bbc9",
+      "headRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "headRefName": "issue-53",
+      "headRefOid": "1be25b285f9b77921f138786f4080f0198141c1c",
+      "closedAt": "2022-05-21T21:42:39Z",
+      "mergedAt": "2022-05-21T21:42:39Z",
+      "mergedBy": "MaxF12",
+      "mergeCommit": {
+        "oid": "76eb64a6adb98bc53a65dcab75ec9923abcb4100"
+      },
+      "comments": [
+        {
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "body": "LGTM",
+          "createdAt": "2022-05-21T21:42:35Z",
+          "updatedAt": "2022-05-21T21:42:35Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 55,
+      "id": "PR_kwDOG6NyZs44OmLh",
+      "title": "moved AEAD algorithm and hash algorithm to MC_CHANNEL_ANNOUNCE",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/55",
+      "state": "MERGED",
+      "author": "GrumpyOldTroll",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2022-05-21T04:32:44Z",
+      "updatedAt": "2022-05-21T21:43:39Z",
+      "baseRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "baseRefName": "main",
+      "baseRefOid": "7c37be5e113783351ee07e09d0fdaec721f5bbc9",
+      "headRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "headRefName": "issue-42",
+      "headRefOid": "a0b51ae382a9f06ae19fbd66653520533689f00a",
+      "closedAt": "2022-05-21T21:43:39Z",
+      "mergedAt": "2022-05-21T21:43:39Z",
+      "mergedBy": "MaxF12",
+      "mergeCommit": {
+        "oid": "cf346a6a1b57a72d46df66d0ebe66aa3f5514d18"
+      },
+      "comments": [
+        {
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "body": "LGTM",
+          "createdAt": "2022-05-21T21:43:34Z",
+          "updatedAt": "2022-05-21T21:43:34Z"
+        }
+      ],
+      "reviews": []
     }
   ]
 }
