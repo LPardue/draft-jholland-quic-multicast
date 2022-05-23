@@ -1019,7 +1019,7 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Holland, et al.</td>
-<td class="center">Expires 22 November 2022</td>
+<td class="center">Expires 24 November 2022</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1032,12 +1032,12 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 <dd class="internet-draft">draft-jholland-quic-multicast-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2022-05-21" class="published">21 May 2022</time>
+<time datetime="2022-05-23" class="published">23 May 2022</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Experimental</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2022-11-22">22 November 2022</time></dd>
+<dd class="expires"><time datetime="2022-11-24">24 November 2022</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1093,7 +1093,7 @@ svg [stroke="fill"], svg [fill^="#fff"] {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 22 November 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 24 November 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1124,12 +1124,17 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 <nav class="toc"><ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
             <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="xref">1</a>.  <a href="#name-introduction" class="xref">Introduction</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
+                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="xref">1.1</a>.  <a href="#name-conventions-and-definitions" class="xref">Conventions and Definitions</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
             <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="xref">2</a>.  <a href="#name-multicast-channel" class="xref">Multicast Channel</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
-            <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3" class="xref">3</a>.  <a href="#name-transport-parameter" class="xref">Transport Parameter</a></p>
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="xref">3</a>.  <a href="#name-transport-parameter" class="xref">Transport Parameter</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
             <p id="section-toc.1-1.4.1"><a href="#section-4" class="xref">4</a>.  <a href="#name-extension-overview" class="xref">Extension Overview</a></p>
@@ -1251,17 +1256,23 @@ svg [stroke="fill"], svg [fill^="#fff"] {
       </h2>
 <p id="section-1-1">This document specifies an extension to QUIC version 1 <span>[<a href="#RFC9000" class="xref">RFC9000</a>]</span> to enable the use of multicast IP transport of identical data packets for use in many individual QUIC connections.<a href="#section-1-1" class="pilcrow">¶</a></p>
 <p id="section-1-2">The multicast data can only be consumed in conjunction with a unicast QUIC connection.
-When support for multicast is negotiated, the server can optionally advertise existence of one or more multicast channels that contain unidirectional data streams from server to client, and the client can optionally join the multicast channel and verify from integrity data the server provides that correct data is being received, then acknowledge the data from the multicast channel(s) over the unicast connection.<a href="#section-1-2" class="pilcrow">¶</a></p>
+When support for multicast is negotiated, the server can optionally advertise the existence of one or more multicast channels that contain unidirectional data streams from server to client, and the client can optionally join the multicast channel and verify from integrity data the server provides that correct data is being received, then acknowledge the data from the multicast channel(s) over the unicast connection.<a href="#section-1-2" class="pilcrow">¶</a></p>
 <p id="section-1-3">Enabling this can provide large scalability benefits for popular traffic over multicast-capable networks.<a href="#section-1-3" class="pilcrow">¶</a></p>
-<p id="section-1-4">This document does not define any multicast transport except server to client and only includes semantics for source-specific multicast.
-## Conventions and Definitions<a href="#section-1-4" class="pilcrow">¶</a></p>
-<p id="section-1-5">The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+<p id="section-1-4">This document does not define any multicast transport except server to client and only includes semantics for source-specific multicast.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<div id="conventions-and-definitions">
+<section id="section-1.1">
+        <h3 id="name-conventions-and-definitions">
+<a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-conventions-and-definitions" class="section-name selfRef">Conventions and Definitions</a>
+        </h3>
+<p id="section-1.1-1">The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
 NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED",
 "MAY", and "OPTIONAL" in this document are to be interpreted as
 described in BCP 14 <span>[<a href="#RFC2119" class="xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="xref">RFC8174</a>]</span> when, and only when, they
-appear in all capitals, as shown here.<a href="#section-1-5" class="pilcrow">¶</a></p>
-<p id="section-1-6">Commonly used terms in this document are described below.<a href="#section-1-6" class="pilcrow">¶</a></p>
-<p id="section-1-7">(S,G): A tuple of IP addresses identifying a source-specific multicast channel, as described in <span>[<a href="#RFC4607" class="xref">RFC4607</a>]</span>.<a href="#section-1-7" class="pilcrow">¶</a></p>
+appear in all capitals, as shown here.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+<p id="section-1.1-2">Commonly used terms in this document are described below.<a href="#section-1.1-2" class="pilcrow">¶</a></p>
+<p id="section-1.1-3">(S,G): A tuple of IP addresses identifying a source-specific multicast channel, as described in <span>[<a href="#RFC4607" class="xref">RFC4607</a>]</span>.<a href="#section-1.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="multicast-channel">
@@ -1278,14 +1289,14 @@ This however does not impose a requirement on how the underlying network stack h
 <p id="section-2-5">Channels carry only 1-RTT packets.
 Packets associated with a channel contain a Channel ID in place of a Destination Connection ID.
 (A Channel ID cannot be zero length.)
-This adds a layer of indirection to the process described in Section 5.2 of <span>[<a href="#RFC9000" class="xref">RFC9000</a>]</span>} for matching packets to connections upon receipt.
+This adds a layer of indirection to the process described in Section 5.2 of <span>[<a href="#RFC9000" class="xref">RFC9000</a>]</span> for matching packets to connections upon receipt.
 Incoming packets received on the network path associated with a channel use the Channel ID to associate the packet with a joined channel.<a href="#section-2-5" class="pilcrow">¶</a></p>
 <p id="section-2-6">A client with a matching joined channel always has at least one connection associated with the channel.
 If a client has no matching joined channel, the packet is discarded.<a href="#section-2-6" class="pilcrow">¶</a></p>
-<p id="section-2-7">Since the network path for a channel is unidirectional, packets associated with a channel are acknowledged with MP_CHANNEL_ACK frames <a href="#channel-ack-frame" class="xref">Section 11.6</a> instead of with ACK frames.
+<p id="section-2-7">Since the network path for a channel is unidirectional, packets associated with a channel are acknowledged with MP_CHANNEL_ACK frames <a href="#channel-ack-frame" class="xref">Section 11.6</a> instead of ACK frames.
 Each channel has an independent packet number space.<a href="#section-2-7" class="pilcrow">¶</a></p>
 <p id="section-2-8">The use of any particular channel is OPTIONAL for both the server and the client.
-It is recommended that applications designed to leverage the multicast capabilities of this extension also provide graceeful degradation for endpoints that do not or cannot make use of the multicast functionality.<a href="#section-2-8" class="pilcrow">¶</a></p>
+It is recommended that applications designed to leverage the multicast capabilities of this extension also provide graceful degradation for endpoints that do not or cannot make use of the multicast functionality.<a href="#section-2-8" class="pilcrow">¶</a></p>
 <p id="section-2-9">The server has access to all data transmitted on any multicast channel it uses, and could optionally send this data with unicast instead.<a href="#section-2-9" class="pilcrow">¶</a></p>
 <p id="section-2-10">No special handling of the data is required in a client application that has enabled multicast.
 A datagram or any particular bytes from a server-initiated unidirectional stream can be delivered over the unicast connection or a multicast channel transparently to the client.<a href="#section-2-10" class="pilcrow">¶</a></p>
@@ -1297,7 +1308,7 @@ A datagram or any particular bytes from a server-initiated unidirectional stream
       <h2 id="name-transport-parameter">
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-transport-parameter" class="section-name selfRef">Transport Parameter</a>
       </h2>
-<p id="section-3-1">Support for multicast extesnsions in a client is advertised by means of a QUIC transport parameter:<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-1">Support for multicast extensions in a client is advertised by means of a QUIC transport parameter:<a href="#section-3-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3-2.1">name: multicast_client_params (TBD - experiments use 0xff3e800)<a href="#section-3-2.1" class="pilcrow">¶</a>
 </li>
@@ -1330,7 +1341,7 @@ multicast_client_params {
         <li class="normal" id="section-3-7.2">0x2 is set if IPv6 channels are permitted<a href="#section-3-7.2" class="pilcrow">¶</a>
 </li>
       </ul>
-<p id="section-3-8">A server MUST NOT send MC_CHANNEL_PROPERTIES with addresses using an IP Family that is not supported according to the Capabilities in the multicast_client_params, unless and until a later MC_CLIENT_LIMITS frame adds permission for a different address family.<a href="#section-3-8" class="pilcrow">¶</a></p>
+<p id="section-3-8">A server MUST NOT send MC_CHANNEL_ANNOUNCE (<a href="#channel-announce-frame" class="xref">Section 11.1</a>) frames with addresses using an IP Family that is not supported according to the Capabilities in the multicast_client_params, unless and until a later MC_CLIENT_LIMITS (<a href="#client-limits-frame" class="xref">Section 11.8</a>)  frame adds permission for a different address family.<a href="#section-3-8" class="pilcrow">¶</a></p>
 <p id="section-3-9">The Capabilities Field, Max Aggregate Rate, and Max Channel IDs are the same as in MC_CLIENT_LIMITS frames (<a href="#client-limits-frame" class="xref">Section 11.8</a>) and provide the initial client values.<a href="#section-3-9" class="pilcrow">¶</a></p>
 <p id="section-3-10">The AEAD Algorithms List field is in order of preference (most preferred occuring first) using values from the registry below. It lists the algorithms the client is willing to use to decrypt data in multicast channels, and the server MUST NOT send a MC_CHANNEL_JOIN to this client for any channels using unsupported algorithms:<a href="#section-3-10" class="pilcrow">¶</a></p>
 <ul class="normal">
@@ -1353,11 +1364,11 @@ multicast_client_params {
       </h2>
 <p id="section-4-1">A client has the option of refusal and the power to impose upper bound maxima on several resources (see <a href="#flow-control" class="xref">Section 5</a>), but otherwise its join status for all multicast channels is entirely managed by the server.<a href="#section-4-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-4-2.1">A client MUST NOT join a channel without receiving instructions from a server to do so<a href="#section-4-2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-4-2.1">A client MUST NOT join a channel without receiving instructions from a server to do so.<a href="#section-4-2.1" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-4-2.2">A client MUST leave joined channels when instructed by the server to do so<a href="#section-4-2.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-4-2.2">A client MUST leave joined channels when instructed by the server to do so.<a href="#section-4-2.2" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-4-2.3">A client MAY leave channels or refuse to join channels, regardless of instructions from the server<a href="#section-4-2.3" class="pilcrow">¶</a>
+        <li class="normal" id="section-4-2.3">A client MAY leave channels or refuse to join channels, regardless of instructions from the server.<a href="#section-4-2.3" class="pilcrow">¶</a>
 </li>
       </ul>
 <div id="channel-management">
@@ -1367,7 +1378,7 @@ multicast_client_params {
         </h3>
 <p id="section-4.1-1">The client tells its server about some restrictions on resources that it is capable of processing with the initial values in the multicast_client_params transport parameter (<a href="#transport-parameter" class="xref">Section 3</a>) and later can update these limits with MC_CLIENT_LIMITS <a href="#client-limits-frame" class="xref">Section 11.8</a> frames. Servers ensure the set of channels the client is currently requested to join remains within these advertised client limits as covered in <a href="#flow-control" class="xref">Section 5</a>.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
 <p id="section-4.1-2">The server asks the client to join channels with MC_CHANNEL_JOIN (<a href="#channel-join-frame" class="xref">Section 11.3</a>) frames and to leave channels with MC_CHANNEL_LEAVE (<a href="#channel-leave-frame" class="xref">Section 11.4</a>) frames.<a href="#section-4.1-2" class="pilcrow">¶</a></p>
-<p id="section-4.1-3">The server uses MC_CHANNEL_PROPERTIES (<a href="#channel-properties-frame" class="xref">Section 11.2</a>) frames before any join or leave frames for the channel to describe the channel properties to the client, including values the client can use to ensure the server's requests remain within the limits it has sent to the server, as well as the keys necessary to decode packets in the channel.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
+<p id="section-4.1-3">The server uses MC_CHANNEL_ANNOUNCE (<a href="#channel-announce-frame" class="xref">Section 11.1</a>) and MC_CHANNEL_PROPERTIES (<a href="#channel-properties-frame" class="xref">Section 11.2</a>) frames before any join or leave frames for the channel to describe the channel properties to the client, including values the client can use to ensure the server's requests remain within the limits it has sent to the server, as well as the keys necessary to decode packets in the channel.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
 <p id="section-4.1-4">When the server has asked the client to join a channel, it also sends MC_CHANNEL_INTEGRITY frames (<a href="#channel-integrity-frame" class="xref">Section 11.5</a>) to enable the client to verify packet integrity before processing the packet.
 A client MUST NOT decode packets for a channel for which it has not received an applicable set of MC_CHANNEL_PROPERTIES (<a href="#channel-properties-frame" class="xref">Section 11.2</a>) frames containing the full set of data required, or for which it has not received a matching packet hash in an MC_CHANNEL_INTEGRITY (<a href="#channel-integrity-frame" class="xref">Section 11.5</a>) frame.<a href="#section-4.1-4" class="pilcrow">¶</a></p>
 <p id="section-4.1-5">The server ensures that in aggregate, all channels that the client has currently been asked to join and that the client has not left or declined to join fit within the limits indicated by the initial values in the transport parameter or last MC_CLIENT_LIMITS (<a href="#client-limits-frame" class="xref">Section 11.8</a>) frame the server received.<a href="#section-4.1-5" class="pilcrow">¶</a></p>
@@ -1380,7 +1391,7 @@ A client MUST NOT decode packets for a channel for which it has not received an 
         </h3>
 <p id="section-4.2-1">The client sends back information about how it has responded to the server's requests to join and leave channels in MC_CLIENT_CHANNEL_STATE (<a href="#client-channel-state-frame" class="xref">Section 11.10</a>) frames.
 MC_CLIENT_CHANNEL_STATE frames are only sent for channels after the server has requested the client to join the channel, and are thereafter sent any time the state changes.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
-<p id="section-4.2-2">Clients that receive and decode data on a multicast channel send acknowledgements for the data on a unicast connection using MC_CHANNEL_ACK (<a href="#channel-ack-frame" class="xref">Section 11.6</a>) frames.
+<p id="section-4.2-2">Clients that receive and decode data on a multicast channel send acknowledgements for the data on the unicast connection using MC_CHANNEL_ACK (<a href="#channel-ack-frame" class="xref">Section 11.6</a>) frames.
 Channels also will periodically contain PATH_CHALLENGE (<span>[<a href="#RFC9000" class="xref">RFC9000</a>]</span> Section 19.17) frames, which cause clients to send MC_PATH_RESPONSE (<a href="#path-response-frame" class="xref">Section 11.7</a>) frames on the unicast connection in addition to their MC_CHANNEL_ACK frames.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1632,10 +1643,10 @@ To maintain forward secrecy and prevent malicious clients from decrypting packet
 </li>
           <li class="normal" id="section-11.2-7.8">Max Idle Time: The maximum expected idle time of the channel.  If this amount of time passes in a joined channel without data received, clients SHOULD leave the channel with reason Max Idle Time Exceeded.<a href="#section-11.2-7.8" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-11.2-7.9">ACK Bundle Size:nThe minimum number of ACKs a client should send in a single QUIC packet. If the max_ack_delay would force a client to send a packet that only consists of MC_CHANNEL_ACK frames, it SHOULD instead wait with sending until at least the specified number of acknowledgements have been collected. However, the Client MUST send any pending acknowledgements at least once per Max Idle Time to prevent the Server from perceiving the channel as interrupted.<a href="#section-11.2-7.9" class="pilcrow">¶</a>
+          <li class="normal" id="section-11.2-7.9">ACK Bundle Size: The minimum number of ACKs a client should send in a single QUIC packet. If the max_ack_delay would force a client to send a packet that only consists of MC_CHANNEL_ACK frames, it SHOULD instead wait with sending until at least the specified number of acknowledgements have been collected. However, the Client MUST send any pending acknowledgements at least once per Max Idle Time to prevent the Server from perceiving the channel as interrupted.<a href="#section-11.2-7.9" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-11.2-8">From Packet Number and Until Packet Number are used to indicate the packet number (Section 17.1 of <span>[<a href="#RFC9000" class="xref">RFC9000</a>]</span>) the 1-RTT packets received) over which these values are applicable.<a href="#section-11.2-8" class="pilcrow">¶</a></p>
+<p id="section-11.2-8">From Packet Number and Until Packet Number are used to indicate the packet number (Section 17.1 of <span>[<a href="#RFC9000" class="xref">RFC9000</a>]</span>) the 1-RTT packets received over which these values are applicable.<a href="#section-11.2-8" class="pilcrow">¶</a></p>
 <p id="section-11.2-9">A From Packet Number without an Until Packet Number has an unspecified termination.<a href="#section-11.2-9" class="pilcrow">¶</a></p>
 <p id="section-11.2-10">If new property values appear and are different from prior values, the From Packet Number implicitly sets the Until Packet Number of the prior property value equal to one below the new From Packet Number for all the changed properties.<a href="#section-11.2-10" class="pilcrow">¶</a></p>
 <p id="section-11.2-11">The properties of a channel MAY change during its lifetime. As such, a server SHOULD NOT send properties for channels except those the client has joined or will be imminently asked to join.<a href="#section-11.2-11" class="pilcrow">¶</a></p>
@@ -1771,7 +1782,7 @@ MC_CHANNEL_ACK Frame {
         <h3 id="name-mc_path_response">
 <a href="#section-11.7" class="section-number selfRef">11.7. </a><a href="#name-mc_path_response" class="section-name selfRef">MC_PATH_RESPONSE</a>
         </h3>
-<p id="section-11.7-1">MC_PATH_RESPONSE frames are sent from client to server in a unicast connection in response to an PATH_CHALLENGE received in a channel.  Like PATH_RESPONSE but includes a channel id.<a href="#section-11.7-1" class="pilcrow">¶</a></p>
+<p id="section-11.7-1">MC_PATH_RESPONSE frames are sent from a client to a server in the unicast connection in response to a PATH_CHALLENGE received in a channel.  Like PATH_RESPONSE but includes a channel id.<a href="#section-11.7-1" class="pilcrow">¶</a></p>
 <p id="section-11.7-2">MC_PATH_RESPONSE frames are formatted as shown in <a href="#fig-mc-path-response-format" class="xref">Figure 8</a>.<a href="#section-11.7-2" class="pilcrow">¶</a></p>
 <span id="name-mc_path_response-frame-form"></span><div id="fig-mc-path-response-format">
 <figure id="figure-8">
@@ -1926,7 +1937,7 @@ MC_CLIENT_CHANNEL_STATE Frame {
 <p id="section-11.10-10">(TODO: Or should we try to reuse PATH_ABANDON and/or PATH_STATUS?  I don't think they're sufficient, but maybe?):
   - <span>[<a href="#I-D.draft-ietf-quic-multipath" class="xref">I-D.draft-ietf-quic-multipath</a>]</span>
   - <a href="https://datatracker.ietf.org/doc/html/draft-liu-multipath-quic-04#section-9.1">https://datatracker.ietf.org/doc/html/draft-liu-multipath-quic-04#section-9.1</a><a href="#section-11.10-10" class="pilcrow">¶</a></p>
-<p id="section-11.10-11">The things server needs to know for state changes <em>could</em> maybe be inferred from ack responses but explicit seems better, allowing for a more proactive response under strain?<a href="#section-11.10-11" class="pilcrow">¶</a></p>
+<p id="section-11.10-11">(Authors comment: The things server needs to know for state changes <em>could</em> maybe be inferred from ack responses but explicit seems better, allowing for a more proactive response under strain?)<a href="#section-11.10-11" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2028,7 +2039,7 @@ Since the channel is strictly 1-way server to client, the general principle is t
       <h2 id="name-security-considerations">
 <a href="#section-14" class="section-number selfRef">14. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-14-1">Mostly incorporate <span>[<a href="#I-D.draft-krose-multicast-security" class="xref">I-D.draft-krose-multicast-security</a>]</span>.  Anything else?<a href="#section-14-1" class="pilcrow">¶</a></p>
+<p id="section-14-1">(Authors comment: Mostly incorporate <span>[<a href="#I-D.draft-krose-multicast-security" class="xref">I-D.draft-krose-multicast-security</a>]</span>.  Anything else?<a href="#section-14-1" class="pilcrow">¶</a></p>
 <p id="section-14-2">e.g. if a different legitimate quic connection says someone
 else's quic multicast stream is theirs, that's maybe a problem
 worth protecting against.  Maybe we need a periodic asymmetric
@@ -2041,11 +2052,11 @@ the multicast stream provides a way for the client to validate
 that the unicast stream is authorized to use it for data transport
 via proof they know the private key corresponding to the public
 key that arrived on the multicast channel.
-(Note this doesn't prevent unauthorized receipt of multicast
+Note this doesn't prevent unauthorized receipt of multicast
 data packts, but does prevent a quic server from lying when
 claiming a multicast data channel belongs to it, preventing
-legit receivers from consuming it.)<a href="#section-14-2" class="pilcrow">¶</a></p>
-<p id="section-14-3">(alternatively, can the multicast channel just periodically say
+legit receivers from consuming it.<a href="#section-14-2" class="pilcrow">¶</a></p>
+<p id="section-14-3">alternatively, can the multicast channel just periodically say
 what domain name is expected for the quic connection and get the
 same crypto guarantee of a proper sender via the domain's cert,
 which was already checked on the unicast channel?)<a href="#section-14-3" class="pilcrow">¶</a></p>
