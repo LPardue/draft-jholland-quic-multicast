@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-05-22T00:28:53.217277+00:00",
+  "timestamp": "2022-05-24T00:32:47.091345+00:00",
   "repo": "GrumpyOldTroll/draft-jholland-quic-multicast",
   "labels": [
     {
@@ -666,11 +666,13 @@
       "state": "OPEN",
       "author": "MaxF12",
       "authorAssociation": "COLLABORATOR",
-      "assignees": [],
+      "assignees": [
+        "MaxF12"
+      ],
       "labels": [],
       "body": "The initial time to join a channel can be significantly longer than the value in max idle time (as that is intended as the time to detect a disruption of an already established channel) as the join has to be propagated and the multicast tree constructed. \r\n\r\nThere could probably be an additional field in MC_CHANNEL_PROPERTIES (something like max establishment time) or just general guidance and a recommendation on the time it might take. ",
       "createdAt": "2022-05-04T12:45:17Z",
-      "updatedAt": "2022-05-21T22:57:00Z",
+      "updatedAt": "2022-05-23T12:13:25Z",
       "closedAt": null,
       "comments": [
         {
@@ -803,15 +805,15 @@
       "id": "I_kwDOG6NyZs5KB4wm",
       "title": "move aead algorithm to CHANNEL_ANNOUNCE",
       "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/42",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "GrumpyOldTroll",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Suggested change from @squarooticus :\r\n\r\nAnnounce the payload AEAD algorithm in CHANNEL_ANNOUNCE and just assume it isn't going to change for the lifetime of the channel. This probably works better with existing QUIC stacks that assume only the key, rather than the alg, will change during a connection.",
       "createdAt": "2022-05-19T16:09:52Z",
-      "updatedAt": "2022-05-19T17:01:47Z",
-      "closedAt": null,
+      "updatedAt": "2022-05-23T13:36:38Z",
+      "closedAt": "2022-05-23T13:36:38Z",
       "comments": [
         {
           "author": "MaxF12",
@@ -961,11 +963,13 @@
       "state": "OPEN",
       "author": "GrumpyOldTroll",
       "authorAssociation": "OWNER",
-      "assignees": [],
+      "assignees": [
+        "MaxF12"
+      ],
       "labels": [],
       "body": "We at least need a channel state diagram for client, and probably also for server.\r\n(like https://www.rfc-editor.org/rfc/rfc9000#fig-stream-send-states and https://www.rfc-editor.org/rfc/rfc9000#fig-stream-recv-states and https://www.ietf.org/archive/id/draft-ietf-quic-multipath-01.html#fig-path-states)",
       "createdAt": "2022-05-20T23:17:18Z",
-      "updatedAt": "2022-05-21T21:37:54Z",
+      "updatedAt": "2022-05-23T13:43:48Z",
       "closedAt": null,
       "comments": [
         {
@@ -974,6 +978,13 @@
           "body": "Agreed, I was thinking about states when I made the object as well. So far I have 4 (Idle, joining, joined and timed out). Do you think we need more?",
           "createdAt": "2022-05-21T21:37:54Z",
           "updatedAt": "2022-05-21T21:37:54Z"
+        },
+        {
+          "author": "GrumpyOldTroll",
+          "authorAssociation": "OWNER",
+          "body": "I think I was thinking different names for them in the client, but maybe :\r\n - unjoined\r\n - attempting join (joined and MC_CLIENT_CHANNEL_STATE: Joined sent, but no data received yet)\r\n - joined (data received and MC_CHANNEL_ACK sent)\r\n - held down (timer or status prevents joining--generally should go here after an error but not a clean leave)\r\n\r\nFor the server side I was thinking:\r\n - client unjoined\r\n - client pending join (sent a MC_CHANNEL_JOIN, no MC_CLIENT_CHANNEL_STATE received yet)\r\n - client joined (MC_CLIENT_CHANNEL_STATE with Joined received)\r\n - client pending leave\r\n - client held down (unjoined and server will not currently retry join due to prior error)\r\n\r\nI wasn't sure whether we need a \"client confirmed\" state where we've seen an ack of channel data on the server, I'm ambivalent on it.\r\n\r\nI think it might also be useful to define some hold-down conditions and timers, which I don't think we've gotten into yet.  We probably need a retry section and some general advice about how to handle error-based leave/decline events that hold down a retry for some time, maybe a growing time.",
+          "createdAt": "2022-05-22T02:00:52Z",
+          "updatedAt": "2022-05-22T02:00:52Z"
         }
       ]
     },
@@ -985,11 +996,13 @@
       "state": "OPEN",
       "author": "GrumpyOldTroll",
       "authorAssociation": "OWNER",
-      "assignees": [],
+      "assignees": [
+        "MaxF12"
+      ],
       "labels": [],
       "body": "Flow diagrams like these should show the important parts for channel use examples and who they're sent by:\r\n- https://www.rfc-editor.org/rfc/rfc9000#fig-auth-cid\r\n- https://www.rfc-editor.org/rfc/rfc9000#figure-5\r\n",
       "createdAt": "2022-05-20T23:23:42Z",
-      "updatedAt": "2022-05-20T23:23:42Z",
+      "updatedAt": "2022-05-23T16:35:12Z",
       "closedAt": null,
       "comments": []
     },
@@ -1022,6 +1035,22 @@
       "body": "",
       "createdAt": "2022-05-21T04:06:36Z",
       "updatedAt": "2022-05-21T04:06:36Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 58,
+      "id": "I_kwDOG6NyZs5KPE26",
+      "title": "Retiring a channel",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/issues/58",
+      "state": "OPEN",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Two things that might need clarification:\r\n\r\n- Retiring a channel that is currently joined should probably force an automatic leave\r\n-  Should there be a Retired option for the MC_CHANNEL_STATE frame so the server knows if a channel was retired successfully? ",
+      "createdAt": "2022-05-23T17:03:10Z",
+      "updatedAt": "2022-05-23T17:03:10Z",
       "closedAt": null,
       "comments": []
     }
@@ -2130,24 +2159,26 @@
       "id": "PR_kwDOG6NyZs44Impv",
       "title": "Michaels editorial comments",
       "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/47",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "MaxF12",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2022-05-19T16:44:25Z",
-      "updatedAt": "2022-05-21T04:18:45Z",
+      "updatedAt": "2022-05-23T12:09:50Z",
       "baseRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
       "baseRefName": "main",
-      "baseRefOid": "7c37be5e113783351ee07e09d0fdaec721f5bbc9",
+      "baseRefOid": "cf346a6a1b57a72d46df66d0ebe66aa3f5514d18",
       "headRepository": "MaxF12/draft-jholland-quic-multicast",
       "headRefName": "mwelzl-comments",
-      "headRefOid": "5b14aa30a227e8174aebccc4e610da956b81c69c",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "8dd175fa82f0db1e13c8493193afa1b3b3a9f6b3",
+      "closedAt": "2022-05-23T12:09:50Z",
+      "mergedAt": "2022-05-23T12:09:50Z",
+      "mergedBy": "MaxF12",
+      "mergeCommit": {
+        "oid": "f81a18b78c809e1cee09db520e14478e13518a32"
+      },
       "comments": [],
       "reviews": [
         {
@@ -2254,6 +2285,99 @@
           "updatedAt": "2022-05-21T21:43:34Z"
         }
       ],
+      "reviews": []
+    },
+    {
+      "number": 56,
+      "id": "PR_kwDOG6NyZs44TGXD",
+      "title": "Add channel state diagram",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/56",
+      "state": "OPEN",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Only from the client point of view for now, I think server side might not actually be necessary because its very similar? (Basically just switch send/receive in front of the frames I think) ",
+      "createdAt": "2022-05-23T14:35:51Z",
+      "updatedAt": "2022-05-23T14:40:55Z",
+      "baseRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "baseRefName": "main",
+      "baseRefOid": "f81a18b78c809e1cee09db520e14478e13518a32",
+      "headRepository": "MaxF12/draft-jholland-quic-multicast",
+      "headRefName": "issue-50",
+      "headRefOid": "1cf96f4950af8f5f55d8b967c08772f0b05d5fd6",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I guess a question would be where \"declined join\" goes, does it just return to unjoined or does it retire the channel (probably not)?",
+          "createdAt": "2022-05-23T14:40:16Z",
+          "updatedAt": "2022-05-23T14:40:16Z"
+        },
+        {
+          "author": "MaxF12",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I also didn't include \"Held down\" as a state since I didn't see what interaction would make it transition back to \"unjoined\", so it seemed redundant ",
+          "createdAt": "2022-05-23T14:40:55Z",
+          "updatedAt": "2022-05-23T14:40:55Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 57,
+      "id": "PR_kwDOG6NyZs44TG8V",
+      "title": "Add text about initial timeout",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/57",
+      "state": "OPEN",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Recommendation is based on fact that multicast sender likely is colocated with unicast sender so RTT seemed like the right value to choose, up for discussion though obviously ",
+      "createdAt": "2022-05-23T14:37:42Z",
+      "updatedAt": "2022-05-23T14:37:43Z",
+      "baseRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "baseRefName": "main",
+      "baseRefOid": "f81a18b78c809e1cee09db520e14478e13518a32",
+      "headRepository": "MaxF12/draft-jholland-quic-multicast",
+      "headRefName": "issue-33",
+      "headRefOid": "bee04806fa5f9ec6218a704b9d72b95b1e9aa395",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 59,
+      "id": "PR_kwDOG6NyZs44Tytw",
+      "title": "First version of flow diagram",
+      "url": "https://github.com/GrumpyOldTroll/draft-jholland-quic-multicast/pull/59",
+      "state": "OPEN",
+      "author": "MaxF12",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Will maybe require some changes depending on #58.\r\n\r\nNot sure if its best to always include the ID and full frame names (makes it unnecessarily wide) ",
+      "createdAt": "2022-05-23T17:10:14Z",
+      "updatedAt": "2022-05-23T17:10:15Z",
+      "baseRepository": "GrumpyOldTroll/draft-jholland-quic-multicast",
+      "baseRefName": "main",
+      "baseRefOid": "f81a18b78c809e1cee09db520e14478e13518a32",
+      "headRepository": "MaxF12/draft-jholland-quic-multicast",
+      "headRefName": "issue-51",
+      "headRefOid": "60b0d853eed50c3b778007816b269367f01c727f",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
       "reviews": []
     }
   ]
