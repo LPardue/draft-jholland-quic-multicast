@@ -1428,6 +1428,9 @@ A client MUST NOT decode packets for a channel for which it has not received an 
 MC_CLIENT_CHANNEL_STATE frames are only sent for channels after the server has requested the client to join the channel, and are thereafter sent any time the state changes.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
 <p id="section-4.2-2">Clients that receive and decode data on a multicast channel send acknowledgements for the data on the unicast connection using MC_CHANNEL_ACK (<a href="#channel-ack-frame" class="xref">Section 11.6</a>) frames.
 Channels also will periodically contain PATH_CHALLENGE (<span>[<a href="#RFC9000" class="xref">RFC9000</a>]</span> Section 19.17) frames, which cause clients to send MC_PATH_RESPONSE (<a href="#path-response-frame" class="xref">Section 11.7</a>) frames on the unicast connection in addition to their MC_CHANNEL_ACK frames.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
+<p id="section-4.2-3">A server can determine if a client can receive packets on a multicast channel if it receives MC_CHANNEL_ACK frames associated with that channel.
+As such, it is in general up to the server to decide on the time after which it deems a client to be unable to receive packets on a given channel and take appropriate steps, e.g. sending a MC_CHANNEL_LEAVE frame to the client.
+However, a client MAY unilaterally determine that it is unable to receive multicast packets on a channel and indicate this to the server by sending a MC_CLIENT_CHANNEL_STATE frame with state Left and reason No Traffic.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="data-carried-in-channels">
@@ -1971,7 +1974,9 @@ MC_CLIENT_CHANNEL_STATE Frame {
 </li>
           <li class="normal" id="section-11.10-8.13">0x15: Max Streams Exceeded<a href="#section-11.10-8.13" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-11.10-8.14">0x1000000-0x3fffffff: Application-specific Reason<a href="#section-11.10-8.14" class="pilcrow">¶</a>
+          <li class="normal" id="section-11.10-8.14">0x16: No Traffic<a href="#section-11.10-8.14" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-11.10-8.15">0x1000000-0x3fffffff: Application-specific Reason<a href="#section-11.10-8.15" class="pilcrow">¶</a>
 </li>
         </ul>
 <p id="section-11.10-9">A client might receive multicast packets that it can not associate with any channel ID. If these are addressed to an (S,G) that is used for reception in one or more known channels, it MAY leave these channels with reason "Spurious traffic".<a href="#section-11.10-9" class="pilcrow">¶</a></p>

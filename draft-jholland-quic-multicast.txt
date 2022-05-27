@@ -365,6 +365,16 @@ Table of Contents
    which cause clients to send MC_PATH_RESPONSE (Section 11.7) frames on
    the unicast connection in addition to their MC_CHANNEL_ACK frames.
 
+   A server can determine if a client can receive packets on a multicast
+   channel if it receives MC_CHANNEL_ACK frames associated with that
+   channel.  As such, it is in general up to the server to decide on the
+   time after which it deems a client to be unable to receive packets on
+   a given channel and take appropriate steps, e.g. sending a
+   MC_CHANNEL_LEAVE frame to the client.  However, a client MAY
+   unilaterally determine that it is unable to receive multicast packets
+   on a channel and indicate this to the server by sending a
+   MC_CLIENT_CHANNEL_STATE frame with state Left and reason No Traffic.
+
 4.3.  Data Carried in Channels
 
    Data transmitted in a multicast channel is encrypted with symmetric
@@ -1007,6 +1017,8 @@ Table of Contents
    *  0x14: Spurious Traffic
 
    *  0x15: Max Streams Exceeded
+
+   *  0x16: No Traffic
 
    *  0x1000000-0x3fffffff: Application-specific Reason
 
