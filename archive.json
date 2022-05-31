@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-05-29T00:30:04.298484+00:00",
+  "timestamp": "2022-05-31T00:30:04.364136+00:00",
   "repo": "GrumpyOldTroll/draft-jholland-quic-multicast",
   "labels": [
     {
@@ -1132,9 +1132,9 @@
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
-      "body": "- Include reference to CBACC\r\n- Include fan out/ deployment strategies\r\n- Graceful degradation (#44)\r\n- ...",
+      "body": "Depending on size might also be a separate ID.\r\n- Include reference to CBACC\r\n- Include fan out/ deployment strategies\r\n- Graceful degradation (#44)\r\n- Pool/ Channel management on the server side\r\n- ...",
       "createdAt": "2022-05-25T18:28:29Z",
-      "updatedAt": "2022-05-25T18:47:48Z",
+      "updatedAt": "2022-05-29T22:29:08Z",
       "closedAt": null,
       "comments": []
     },
